@@ -1,10 +1,20 @@
-# PROJETO DE IMERSÃO
+# Design do Sistema — Certificação de Indústrias com Selo FIEA de Excelência e Inovação
 
-## Sistema de Monitoramento e Gestão de Combustível para Frota
+> **Stack alvo**: Front-end em **React** (TypeScript) e back-end em **Python** (FastAPI ou Django REST Framework), banco **PostgreSQL** e implantação em contêineres (**Docker** + **Kubernetes** ou Docker Compose para MVP).
 
-### DESCRIÇÃO:
+---
 
-Este projeto visa desenvolver um sistema integrado para o monitoramento e
-controle de consumo de combustível da frota de veículos, com foco na eficiência operacional e na redução de custos. O sistema irá permitir o monitoramento em tempo real do nível de combustível, a gestão de abastecimento e a análise do desempenho dos motoristas, otimizando o uso de combustível e melhorando a sustentabilidade operacional.
+## 1) Visão Geral
+Um sistema web para gerenciar o ciclo completo do **Selo FIEA**: cadastro de indústrias, autoavaliações, auditorias externas, emissão/renovação do selo, trilhas de capacitação, relatórios e dashboards para FIEA e empresas.
 
-A solução proporcionará alertas automáticos para manutenção preventiva, evitar desperdícios de combustível e promover o uso eficiente dos veículos, gerando relatórios detalhados que ajudarão a otimizar os custos operacionais da frota
+### Objetivos
+- Facilitar e padronizar o **processo de certificação** (autoavaliação → auditoria → emissão → renovação).
+- Promover **boas práticas** em sustentabilidade, qualidade, eficiência e inovação.
+- Oferecer **transparência** para empresas e para a FIEA via relatórios e dashboards.
+
+### Escopo (MVP → Evoluções)
+- **MVP**: gestão de empresas e usuários; questionários de autoavaliação; fluxo de auditoria externa; emissão do selo (digital); dashboard básico; relatórios essenciais; notificações por e-mail; área de capacitação com upload de materiais.
+- **V1.1**: portal público de consulta de empresas certificadas; integração com assinatura digital; trilhas de capacitação estruturadas; exportações (CSV/PDF) e relatórios customizáveis.
+- **V1.2**: analytics avançados, benchmarking setorial, API pública de verificação do selo, webhooks para integrações.
+
+---
