@@ -1,24 +1,14 @@
-import { AboutSection } from "./components/AboutSection";
-import { BenefitsSection } from "./components/BenefitsSection";
-import { ContactSection } from "./components/ContactSection";
-import { Footer } from "./components/Footer";
-import { Header } from "./components/Header";
-import { HeroSection } from "./components/HeroSection";
-import { ProcessSection } from "./components/ProcessSection";
+// src/App.tsx
+import { Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
+import { LoginPage } from './pages/LoginPage';
 
 function App() {
   return (
-    <>
-      <Header />
-      <main>
-        <HeroSection />
-        <AboutSection />
-        <BenefitsSection />
-        <ProcessSection />
-        <ContactSection />
-      </main>
-      <Footer />
-    </>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+    </Routes>
   )
 }
 

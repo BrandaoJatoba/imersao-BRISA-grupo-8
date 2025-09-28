@@ -1,7 +1,6 @@
 /* src/index.css */
 @import "tailwindcss";
 
-/* Seus estilos customizados, como a fonte e o .hero-bg, vêm depois */
 body {
     font-family: 'Inter', sans-serif;
 }
