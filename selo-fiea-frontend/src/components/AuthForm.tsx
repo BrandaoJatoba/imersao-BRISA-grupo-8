@@ -1,5 +1,5 @@
-// src/components/AuthForm.tsx
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 // Define os tipos das props que o componente vai receber
 interface AuthFormProps {
@@ -59,7 +59,9 @@ export function AuthForm({ initialTab }: AuthFormProps) {
                 <input type="password" id="login-password" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="••••••••" required />
               </div>
               <div className="flex items-center justify-end mb-6">
-                <a href="#" className="text-sm font-medium text-blue-600 hover:underline">Esqueceu sua senha?</a>
+                <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:underline">
+                  Esqueceu sua senha?
+                </Link>
               </div>
               <div>
                 <button type="submit" className="w-full bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-800 transition-all shadow-sm">Entrar</button>
