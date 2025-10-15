@@ -11,7 +11,7 @@ export function ForgotPasswordPage() {
     event.preventDefault();
     setMessage(''); 
 
-    // ! Chamar a API do back-end aqui
+    // ! chamar a API do back-end aqui
     // try {
     //   const response = await fetch('/api/password/forgot', {
     //     method: 'POST',
@@ -21,7 +21,7 @@ export function ForgotPasswordPage() {
     //   // Lógica de sucesso/erro
     // } catch (error) { ... }
 
-    // simulação
+    // Simulação de sucesso para o front-end:
     console.log("Solicitação de recuperação para o e-mail:", email);
     setMessage('Se uma conta com este e-mail existir em nosso sistema, um link para redefinição de senha foi enviado.');
   };
