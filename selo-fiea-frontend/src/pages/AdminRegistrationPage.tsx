@@ -4,7 +4,7 @@ import { LoginHeader } from "../components/LoginHeader";
 import { Footer } from "../components/Footer";
 import { CheckCircle2, XCircle } from "lucide-react";
 
-export function RegistrationPage() {
+export function AdminRegistrationPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
