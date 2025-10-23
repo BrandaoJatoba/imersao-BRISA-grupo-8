@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { PlusCircle, ShieldAlert } from 'lucide-react';
 import { BadgesTable } from "../components/BadgesTable"; 
 import { DynamicForm } from "../components/DynamicForm";
+import badgeIcon from '/badge.jpg';
 
 // Tipos para os dados (TypeScript)
 export interface Badge {
@@ -12,7 +13,7 @@ export interface Badge {
   validadeMeses: number;
   dataInicioEmissao: Date;
   dataFimEmissao: Date;
-  icon: string; // Exemplo de ícones pré-definidos
+  icon: string; 
   criteria: string[]; // Critérios para obter o selo
 }
 
@@ -25,7 +26,7 @@ const MOCKED_BADGES: Badge[] = [
     validadeMeses: 12,
     dataInicioEmissao: new Date('2023-01-01'),
     dataFimEmissao: new Date('2023-12-31'),
-    icon: 'https://img.freepik.com/psd-gratuitas/garantia-de-qualidade-garantida-do-simbolo-do-logotipo-3d_314999-3853.jpg?semt=ais_hybrid&w=740&q=80',
+    icon: badgeIcon,
     criteria: ['Qualidade de Gestão', 'Sustentabilidade Ambiental', 'Inovação Tecnológica'] 
   },
 ];

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Badge } from '../pages/BadgesPage';
-import { X } from 'lucide-react';
+import { X, UploadCloud } from 'lucide-react';
 
 interface DynamicFormProps {
   badge: Badge | null;
@@ -14,7 +14,7 @@ interface BadgeForm {
   icon: string;
   criteria: string[];
   validadeMeses: number;
-  dataInicioEmissao: string; // Mantém formato "YYYY-MM-DD"
+  dataInicioEmissao: string;
   dataFimEmissao: string;
 }
 
@@ -30,6 +30,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
   });
 
   const [criteriaInput, setCriteriaInput] = useState('');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (badge) {
@@ -46,6 +47,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
           ? new Date(badge.dataFimEmissao).toISOString().split('T')[0]
           : '',
       });
+      setImagePreview(badge.icon); // Mostra o ícone existente
     }
   }, [badge]);
 
@@ -57,6 +59,35 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
       ...prev,
       [name]: type === 'number' ? parseInt(value, 10) || 0 : value,
     }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validação de tamanho (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('O arquivo é muito grande. O tamanho máximo é de 5MB.');
+      e.target.value = ''; // Limpa o input
+      return;
+    }
+
+    // Validação de tipo
+    const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Tipo de arquivo inválido. Apenas SVG, PNG, JPG e WEBP são permitidos.');
+      e.target.value = ''; // Limpa o input
+      return;
+    }
+
+    // Gera preview e converte para Base64
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setFormData(prev => ({ ...prev, icon: base64String }));
+      setImagePreview(base64String);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleAddCriteria = () => {
@@ -148,22 +179,30 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
 
           {/* Ícone */}
           <div className="mb-4">
-            <label
-              htmlFor="icon"
-              className="block text-sm font-medium text-gray-700"
-            >
-              URL do Ícone
-            </label>
-            <input
-              type="url"
-              name="icon"
-              id="icon"
-              value={formData.icon}
-              onChange={handleChange}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-1"
-              placeholder="https://exemplo.com/icone.png"
-              required
-            />
+            <label className="block text-sm font-medium text-gray-700">Ícone do Selo</label>
+            <div className="mt-2 flex items-center gap-x-4">
+              {imagePreview ? (
+                <img src={imagePreview} alt="Pré-visualização do selo" className="h-16 w-16 rounded-full object-cover" />
+              ) : (
+                <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center">
+                  <UploadCloud className="h-8 w-8 text-gray-400" />
+                </div>
+              )}
+              <label htmlFor="icon-upload" className="cursor-pointer rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                <span>Enviar Imagem</span>
+                <input 
+                  id="icon-upload" 
+                  name="icon-upload" 
+                  type="file" 
+                  className="sr-only"
+                  accept="image/svg+xml, image/png, image/jpeg, image/webp"
+                  onChange={handleFileChange}
+                />
+              </label>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              SVG, PNG, JPG ou WEBP. Tamanho máximo de 5MB.
+            </p>
           </div>
 
           {/* Datas e validade */}
