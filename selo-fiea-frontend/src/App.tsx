@@ -25,7 +25,6 @@ function App() {
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/dashboard/perfis" element={<ProfilesPage />} />
       <Route path="/dashboard/selos" element={<BadgesPage />} />
-      {/* Rota Adicionada */}
       <Route path="/dashboard/auditorias" element={<AuditsPage />} />
     </Routes>
   )
