@@ -106,7 +106,7 @@ export function BadgesPage() {
                 <div className="text-center py-12">
                     <ShieldAlert size={48} className="mx-auto text-gray-400" />
                     <h3 className="mt-4 text-xl font-semibold text-gray-700">Nenhum selo encontrado</h3>
-                    <p className="mt-1 text-gray-500">Comece criando um novo tipo de selo.</p>
+                    <p className="mt-1 text-gray-500">Comece criando um novo selo.</p>
                 </div>
             )}
           </div>

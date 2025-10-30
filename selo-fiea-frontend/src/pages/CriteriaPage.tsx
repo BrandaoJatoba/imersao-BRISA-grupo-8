@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PlusCircle, Edit, Trash2, ShieldAlert } from 'lucide-react';
-import { CriterionForm } from "../components/CriterionForm";
+import { CriterionForm } from "../components/CriterionModal";
 
 // Tipos para os dados
 export type Pilar = 'Qualidade' | 'Sustentabilidade' | 'Inovação Tecnológica';
@@ -10,17 +10,17 @@ export interface Criterion {
   id: number;
   pilar: Pilar;
   descricao: string;
-  peso: number; // 1 a 5
+  peso: number;
 }
 
 const PILARES: Pilar[] = ['Qualidade', 'Sustentabilidade', 'Inovação Tecnológica'];
 
 // Dados mocados para simular a API
 export const MOCKED_CRITERIA: Criterion[] = [
-  { id: 1, pilar: 'Qualidade', descricao: 'A empresa possui certificação ISO 9001?', peso: 5 },
-  { id: 2, pilar: 'Qualidade', descricao: 'Os processos de produção são documentados e seguidos rigorosamente?', peso: 4 },
-  { id: 3, pilar: 'Sustentabilidade', descricao: 'A empresa possui um programa de reciclagem de resíduos?', peso: 5 },
-  { id: 4, pilar: 'Inovação Tecnológica', descricao: 'A empresa investe em novas tecnologias para otimização de processos?', peso: 3 },
+  { id: 1, pilar: 'Qualidade', descricao: 'A empresa possui certificação ISO 9001?', peso: 3 },
+  { id: 2, pilar: 'Qualidade', descricao: 'Os processos de produção são documentados e seguidos rigorosamente?', peso: 2 },
+  { id: 3, pilar: 'Sustentabilidade', descricao: 'A empresa possui um programa de reciclagem de resíduos?', peso: 3 },
+  { id: 4, pilar: 'Inovação Tecnológica', descricao: 'A empresa investe em novas tecnologias para otimização de processos?', peso: 1 },
 ];
 
 export function CriteriaPage() {
@@ -63,7 +63,7 @@ export function CriteriaPage() {
         <div className="container mx-auto px-6 py-4">
           <Link to="/dashboard" className="text-sm font-semibold text-blue-600 hover:underline">← Voltar para o Dashboard</Link>
           <h1 className="text-3xl font-bold text-gray-800 mt-2">Gerenciar Critérios de Avaliação</h1>
-          <p className="text-gray-600 mt-1">Adicione, edite ou remova os critérios usados nos selos.</p>
+          <p className="text-gray-600 mt-1">Adicione, edite ou remova os critérios que podem ser utilizados nos selos.</p>
         </div>
       </header>
 
@@ -78,31 +78,15 @@ export function CriteriaPage() {
           </button>
         </div>
 
-        {isCreating && (
-          <CriterionForm
-            onSave={handleSaveCriterion}
-            onCancel={handleCancel}
-          />
-        )}
-
         <div className="space-y-8">
           {PILARES.map(pilar => {
             const pilarCriteria = criteria.filter(c => c.pilar === pilar);
             return (
               <div key={pilar} className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
                 <h2 className="text-2xl font-bold text-gray-700 mb-4">{pilar}</h2>
-                {pilarCriteria.length > 0 ? (
+                {pilarCriteria.length > 0 ? ( 
                   <ul className="space-y-3">
-                    {pilarCriteria.map(criterion =>
-                      editingCriterion?.id === criterion.id ? (
-                        <li key={criterion.id}>
-                          <CriterionForm
-                            criterion={editingCriterion}
-                            onSave={handleSaveCriterion}
-                            onCancel={handleCancel}
-                          />
-                        </li>
-                      ) : (
+                    {pilarCriteria.map(criterion => (
                         <li key={criterion.id} className="flex justify-between items-center p-3 rounded-md bg-gray-50 border">
                           <div className="flex-1">
                             <p className="text-gray-800">{criterion.descricao}</p>
@@ -126,6 +110,14 @@ export function CriteriaPage() {
           })}
         </div>
       </main>
+
+      {(isCreating || editingCriterion) && (
+        <CriterionForm
+          criterion={editingCriterion}
+          onSave={handleSaveCriterion}
+          onCancel={handleCancel}
+        />
+      )}
     </div>
   );
 }

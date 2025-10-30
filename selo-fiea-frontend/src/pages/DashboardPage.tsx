@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Shield, Users, FileText, Award } from 'lucide-react'; // ícones para os cards
+import { Shield, Users, FileText, Award, SlidersHorizontal, ListChecks } from 'lucide-react'; // ícones para os cards
 
 // o ideal aqui seria um header e footer, mas vamos simplificar por agora
 export function DashboardPage() {
@@ -28,6 +28,24 @@ export function DashboardPage() {
                         <span className="mt-auto font-semibold text-blue-600">Acessar →</span>
                     </Link>
 
+                    <Link to="/dashboard/selos" className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow border border-gray-100 flex flex-col items-start">
+                        <div className="bg-yellow-100 text-yellow-500 p-3 rounded-full mb-4">
+                            <Award size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">Gerenciar Selos</h3>
+                        <p className="text-gray-600 mb-4">Crie, edite e gerencie os selos da plataforma.</p>
+                        <span className="mt-auto font-semibold text-blue-600">Acessar →</span>
+                    </Link>
+
+                    <Link to="/dashboard/criterios" className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow border border-gray-100 flex flex-col items-start">
+                        <div className="bg-red-100 text-red-500 p-3 rounded-full mb-4">
+                            <ListChecks size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">Gerenciar Critérios</h3>
+                        <p className="text-gray-600 mb-4">Crie, edite e gerencie os critérios dos selos da plataforma.</p>
+                        <span className="mt-auto font-semibold text-blue-600">Acessar →</span>
+                    </Link>
+
                     {/* Outros Cards (Exemplos) */}
                     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 flex flex-col items-start opacity-50 cursor-not-allowed">
                          <div className="bg-green-100 text-green-700 p-3 rounded-full mb-4">
@@ -37,15 +55,6 @@ export function DashboardPage() {
                         <p className="text-gray-600 mb-4">Adicione ou remova usuários da plataforma.</p>
                         <span className="mt-auto font-semibold text-gray-500">Em breve</span>
                     </div>
-
-                    <Link to="/dashboard/selos" className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow border border-gray-100 flex flex-col items-start">
-                        <div className="bg-yellow-100 text-yellow-500 p-3 rounded-full mb-4">
-                            <Award size={32} />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">Gerenciar Selos</h3>
-                        <p className="text-gray-600 mb-4">Crie, edite e gerencie os selos do sistema.</p>
-                        <span className="mt-auto font-semibold text-blue-600">Acessar →</span>
-                    </Link>
 
                     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 flex flex-col items-start opacity-50 cursor-not-allowed">
                          <div className="bg-orange-100 text-orange-700 p-3 rounded-full mb-4">
