@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Shield, Users, FileText } from 'lucide-react'; // ícones para os cards
+import { Shield, Users, FileText, Award, ListChecks } from 'lucide-react'; // ícones para os cards
 
 // o ideal aqui seria um header e footer, mas vamos simplificar por agora
 export function DashboardPage() {
@@ -25,6 +25,24 @@ export function DashboardPage() {
                         </div>
                         <h3 className="text-xl font-bold text-gray-800 mb-2">Gerenciar Perfis de Acesso</h3>
                         <p className="text-gray-600 mb-4">Crie, edite e defina as permissões para os perfis de usuários do sistema.</p>
+                        <span className="mt-auto font-semibold text-blue-600">Acessar →</span>
+                    </Link>
+
+                    <Link to="/dashboard/selos" className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow border border-gray-100 flex flex-col items-start">
+                        <div className="bg-yellow-100 text-yellow-500 p-3 rounded-full mb-4">
+                            <Award size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">Gerenciar Selos</h3>
+                        <p className="text-gray-600 mb-4">Crie, edite e gerencie os selos da plataforma.</p>
+                        <span className="mt-auto font-semibold text-blue-600">Acessar →</span>
+                    </Link>
+
+                    <Link to="/dashboard/criterios" className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow border border-gray-100 flex flex-col items-start">
+                        <div className="bg-red-100 text-red-500 p-3 rounded-full mb-4">
+                            <ListChecks size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">Gerenciar Critérios</h3>
+                        <p className="text-gray-600 mb-4">Crie, edite e gerencie os critérios dos selos da plataforma.</p>
                         <span className="mt-auto font-semibold text-blue-600">Acessar →</span>
                     </Link>
 
