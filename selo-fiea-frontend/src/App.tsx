@@ -7,6 +7,8 @@ import { AdminRegistrationPage } from './pages/AdminRegistrationPage';
 import { ManagerRegistrationPage } from './pages/ManagerRegistrationPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProfilesPage } from './pages/ProfilesPage';
+import { BadgesPage } from './pages/BadgesPage';
+import { CriteriaPage } from './pages/CriteriaPage';
 import { MyCompaniesPage } from './pages/MyCompaniesPage';
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
       {/* Rotas Protegidas (após login) */}
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/dashboard/perfis" element={<ProfilesPage />} />
+      <Route path="/dashboard/selos" element={<BadgesPage />} />
+      <Route path="/dashboard/criterios" element={<CriteriaPage />} />
     </Routes>
   )
 }
