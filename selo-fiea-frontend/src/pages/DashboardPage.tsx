@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Shield, Users, FileText, Award, SlidersHorizontal, ListChecks } from 'lucide-react'; // ícones para os cards
+import { Shield, Users, FileText, Award, ListChecks } from 'lucide-react'; // ícones para os cards
 
 // o ideal aqui seria um header e footer, mas vamos simplificar por agora
 export function DashboardPage() {
