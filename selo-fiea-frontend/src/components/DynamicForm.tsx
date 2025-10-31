@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import type { Badge } from '../pages/BadgesPage';
+import type { Criterion } from '../pages/CriteriaPage';
 import { X, UploadCloud } from 'lucide-react';
 
 interface DynamicFormProps {
   badge: Badge | null;
   onClose: () => void;
   onSave: (badge: Badge) => void;
+  allCriteria: Criterion[];
 }
 
 interface BadgeForm {
@@ -20,7 +22,7 @@ interface BadgeForm {
   dataFimEmissao: string;
 }
 
-export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
+export function DynamicForm({ badge, onClose, onSave, allCriteria }: DynamicFormProps) {
   const [formData, setFormData] = useState<BadgeForm>({
     name: '',
     description: '',
@@ -31,7 +33,6 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
     dataFimEmissao: '',
   });
 
-  const [criteriaInput, setCriteriaInput] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
@@ -92,13 +93,12 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
     reader.readAsDataURL(file);
   };
 
-  const handleAddCriteria = () => {
-    if (criteriaInput.trim()) {
+  const handleAddCriteria = (criterionDescription: string) => {
+    if (criterionDescription && !formData.criteria.includes(criterionDescription)) {
       setFormData(prev => ({
         ...prev,
-        criteria: [...prev.criteria, criteriaInput.trim()],
+        criteria: [...prev.criteria, criterionDescription],
       }));
-      setCriteriaInput('');
     }
   };
 
@@ -126,12 +126,17 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
     onSave(badgeToSave);
   };
 
+  // Função para truncar o texto e adicionar "..."
+  const truncateText = (text: string, maxLength: number) => {
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl p-6 relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 z-10"
         >
           <X size={24} />
         </button>
@@ -145,7 +150,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
           <div className="mb-4">
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-base font-medium text-gray-700"
             >
               Nome do Selo
             </label>
@@ -155,7 +160,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
               id="name"
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-1"
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2 text-base"
               required
             />
           </div>
@@ -164,7 +169,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
           <div className="mb-4">
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-base font-medium text-gray-700"
             >
               Descrição
             </label>
@@ -174,14 +179,14 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-1"
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2 text-base"
               required
             />
           </div>
 
           {/* Ícone */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Ícone do Selo</label>
+            <label className="block text-base font-medium text-gray-700">Ícone do Selo</label>
             <div className="mt-2 flex items-center gap-x-4">
               {imagePreview ? (
                 <img src={imagePreview} alt="Pré-visualização do selo" className="h-16 w-16 rounded-full object-cover" />
@@ -190,7 +195,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
                   <UploadCloud className="h-8 w-8 text-gray-400" />
                 </div>
               )}
-              <label htmlFor="icon-upload" className="cursor-pointer rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+              <label htmlFor="icon-upload" className="cursor-pointer rounded-md bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                 <span>Enviar Imagem</span>
                 <input 
                   id="icon-upload" 
@@ -212,7 +217,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
             <div>
               <label
                 htmlFor="validadeMeses"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-base font-medium text-gray-700"
               >
                 Validade (meses)
               </label>
@@ -222,7 +227,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
                 id="validadeMeses"
                 value={formData.validadeMeses}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-1"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2 text-base"
                 required
               />
             </div>
@@ -230,7 +235,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
             <div>
               <label
                 htmlFor="dataInicioEmissao"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-base font-medium text-gray-700"
               >
                 Início da Emissão
               </label>
@@ -240,7 +245,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
                 id="dataInicioEmissao"
                 value={formData.dataInicioEmissao}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-1"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2 text-base"
                 required
               />
             </div>
@@ -248,7 +253,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
             <div>
               <label
                 htmlFor="dataFimEmissao"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-base font-medium text-gray-700"
               >
                 Fim da Emissão
               </label>
@@ -258,7 +263,7 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
                 id="dataFimEmissao"
                 value={formData.dataFimEmissao}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-1"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2 text-base"
                 required
               />
             </div>
@@ -266,30 +271,36 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
 
           {/* Critérios */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-base font-medium text-gray-700">
               Critérios
             </label>
             <div className="flex mt-1">
-              <input
-                type="text"
-                value={criteriaInput}
-                onChange={e => setCriteriaInput(e.target.value)}
-                className="flex-grow border-gray-300 rounded-l-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-1"
-                placeholder="Adicionar um critério"
-              />
-              <button
-                type="button"
-                onClick={handleAddCriteria}
-                className="bg-gray-200 px-4 rounded-r-md hover:bg-gray-300"
+              <select
+                onChange={e => handleAddCriteria(e.target.value)}
+                value=""
+                className="flex-grow border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2 min-w-0 text-base"
               >
-                Adicionar
-              </button>
+                <option value="" disabled>Selecione um critério para adicionar</option>
+                {allCriteria
+                  .filter(c => !formData.criteria.includes(c.descricao))
+                  .map(criterion => (
+                    <option
+                      key={criterion.id}
+                      value={criterion.descricao}
+                      title={`${criterion.pilar} - ${criterion.descricao}`}
+                      className="truncate"
+                    >
+                      {truncateText(`${criterion.pilar} - ${criterion.descricao}`, 70)}
+                    </option>
+                  ))
+                }
+              </select>
             </div>
 
-            <ul className="mt-2 space-y-1 list-disc list-inside">
+            <ul className="mt-2 space-y-1 list-disc list-inside ml-1">
               {formData.criteria.map((c, index) => (
                 <li key={index} className="flex items-center justify-between">
-                  <span>{c}</span>
+                  <span className="text-base pr-2">{c}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveCriteria(index)}
@@ -307,13 +318,13 @@ export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300"
+              className="bg-gray-200 text-gray-800 text-md font-bold py-2 px-6 rounded-lg hover:bg-gray-300"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="bg-blue-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-800"
+              className="bg-blue-700 text-white text-md font-bold py-2 px-6 rounded-lg hover:bg-blue-800"
             >
               {badge? 'Salvar' : 'Criar Selo'}
             </button>

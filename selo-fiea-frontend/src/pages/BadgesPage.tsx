@@ -6,6 +6,7 @@ import { PlusCircle, ShieldAlert } from 'lucide-react';
 import { BadgesTable } from "../components/BadgesTable"; 
 import { DynamicForm } from "../components/DynamicForm";
 import badgeIcon from '/badge.jpg';
+import { MOCKED_CRITERIA } from "./CriteriaPage";
 
 // Tipos para os dados (TypeScript)
 export interface Badge {
@@ -23,13 +24,13 @@ export interface Badge {
 const MOCKED_BADGES: Badge[] = [
   { 
     id: 1, 
-    name: 'Selo FIEA', 
+    name: 'Selo FIEA 2025', 
     description: 'Concedido a empresas com excelência em gestão, sustentabilidade ambiental e inovação tecnológica.',
     validadeMeses: 12,
-    dataInicioEmissao: new Date('2023-01-01'),
-    dataFimEmissao: new Date('2023-12-31'),
+    dataInicioEmissao: new Date('2025-01-01'),
+    dataFimEmissao: new Date('2025-12-31'),
     icon: badgeIcon,
-    criteria: ['Qualidade de Gestão', 'Sustentabilidade Ambiental', 'Inovação Tecnológica'] 
+    criteria: ['Qualidade', 'Sustentabilidade', 'Inovação Tecnológica'] 
   },
 ];
 
@@ -107,7 +108,7 @@ export function BadgesPage() {
                 <div className="text-center py-12">
                     <ShieldAlert size={48} className="mx-auto text-gray-400" />
                     <h3 className="mt-4 text-xl font-semibold text-gray-700">Nenhum selo encontrado</h3>
-                    <p className="mt-1 text-gray-500">Comece criando um novo tipo de selo.</p>
+                    <p className="mt-1 text-gray-500">Comece criando um novo selo.</p>
                 </div>
             )}
           </div>
@@ -116,6 +117,7 @@ export function BadgesPage() {
        {isModalOpen && (
           <DynamicForm
             badge={editingBadge}
+            allCriteria={MOCKED_CRITERIA}
             onClose={handleCloseModal}
             onSave={handleSaveBadge}
           />

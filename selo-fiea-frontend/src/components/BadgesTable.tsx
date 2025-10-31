@@ -25,7 +25,7 @@ export function BadgesTable({ badges, onEdit, onDelete }: BadgesTableProps) {
           {badges.map((badge) => (
             <tr key={badge.id} className="border-b border-gray-200 hover:bg-gray-50">
               <td className="py-3 px-4">
-                <img src={badge.icon} alt={`Ícone do selo ${badge.name}`} className="h-10 w-10 rounded-full object-cover" />
+                <img src={badge.icon} alt={`Ícone do selo ${badge.name}`} className="h-12 w-12 rounded-full object-cover" />
               </td>
               <td className="py-3 px-4 font-medium">{badge.name}</td>
               <td className="py-3 px-4">{badge.description}</td>
