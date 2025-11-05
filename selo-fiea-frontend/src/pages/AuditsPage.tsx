@@ -42,7 +42,8 @@ const MOCKED_AUDITORS: User[] = [
   { id: 103, name: 'Carlos Souza' },
 ];
 
-const MOCKED_AUDITS: Audit[] = [
+// ADICIONADO O "export" AQUI
+export const MOCKED_AUDITS: Audit[] = [
   {
     id: 1,
     title: 'Auditoria de Qualidade ISO 9001 - 2024',
@@ -54,6 +55,25 @@ const MOCKED_AUDITS: Audit[] = [
       { id: 't1', title: 'Controle de Documentos', description: 'Verificar versão e aprovação.', scoreLevel: 0, auditorId: 102 },
       { id: 't2', title: 'Gestão de Riscos', description: 'Verificar matriz de riscos.', scoreLevel: 0, auditorId: null },
     ],
+  },
+  // Adicionando mais dados para o dashboard ficar mais rico
+  {
+    id: 2,
+    title: 'Auditoria Ambiental ISO 14001 - 2024',
+    description: 'Verificação de conformidade ambiental.',
+    mainAuditorId: 102,
+    documents: [],
+    status: 'conforme',
+    topics: [],
+  },
+  {
+    id: 3,
+    title: 'Auditoria de Segurança do Trabalho',
+    description: 'Análise de NRs.',
+    mainAuditorId: 101,
+    documents: [],
+    status: 'nao_conforme',
+    topics: [],
   },
 ];
 

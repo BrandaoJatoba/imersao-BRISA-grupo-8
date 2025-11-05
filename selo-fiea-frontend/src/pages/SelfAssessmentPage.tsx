@@ -1,13 +1,13 @@
 // selo-fiea-frontend/src/pages/SelfAssessmentPage.tsx
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import type { Badge } from './BadgesPage';
 import badgeIcon from '/badge.jpg';
 import { ChevronLeft, ChevronRight, Save, Send, Star } from 'lucide-react';
-// Importa os critérios mocados para buscar o "peso"
-import { MOCKED_CRITERIA } from './CriteriaPage'; 
-import { FileUploader } from '../components/FileUploader'; // IMPORTADO
+// Importa o *tipo* Criterion, mas não mais os dados
+import type { Criterion } from './CriteriaPage'; 
+import { FileUploader } from '../components/FileUploader';
 
 // --- Interfaces ---
 
@@ -15,7 +15,7 @@ import { FileUploader } from '../components/FileUploader'; // IMPORTADO
 interface AssessmentAnswer {
   criterion: string;
   responseText: string;
-  documents: File[]; // O estado agora vai usar isso
+  documents: File[];
 }
 
 // O objeto principal da autoavaliação
@@ -26,7 +26,15 @@ interface SelfAssessment {
   answers: AssessmentAnswer[];
 }
 
-// --- Dados Mocados (Simulando API) ---
+// --- DADOS MOCADOS (COM NOVA PONTUAÇÃO LOCAL) ---
+
+// Definição local dos critérios com a pontuação de 9 pontos totais
+const MOCKED_CRITERIA: Criterion[] = [
+  { id: 1, pilar: 'Qualidade', descricao: 'A empresa possui certificação ISO 9001?', peso: 2 },
+  { id: 2, pilar: 'Qualidade', descricao: 'Os processos de produção são documentados e seguidos rigorosamente?', peso: 2 },
+  { id: 3, pilar: 'Sustentabilidade', descricao: 'A empresa possui um programa de reciclagem de resíduos?', peso: 2 },
+  { id: 4, pilar: 'Inovação Tecnológica', descricao: 'A empresa investe em novas tecnologias para otimização de processos?', peso: 3 },
+]; // Total: 2 + 2 + 2 + 3 = 9 pontos
 
 // (Dados ajustados para usar os critérios de CriteriaPage.tsx)
 const MOCKED_BADGES: Badge[] = [
@@ -38,7 +46,7 @@ const MOCKED_BADGES: Badge[] = [
     dataInicioEmissao: new Date('2023-01-01'),
     dataFimEmissao: new Date('2023-12-31'),
     icon: badgeIcon,
-    // Critérios que virarão os "passos" (AJUSTADO PARA USAR OS DADOS CORRETOS)
+    // Critérios que virarão os "passos" (Baseado no MOCKED_CRITERIA local)
     criteria: [
       MOCKED_CRITERIA[0].descricao, // 'A empresa possui certificação ISO 9001?'
       MOCKED_CRITERIA[1].descricao, // 'Os processos de produção são documentados e seguidos rigorosamente?'
@@ -59,7 +67,7 @@ export function SelfAssessmentPage() {
   const [currentStep, setCurrentStep] = useState(0); // Index do critério atual
   const [isLoading, setIsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-  // Estado para buscar os pesos
+  // Estado para buscar os pesos (usando a constante local)
   const [allCriteria] = useState(MOCKED_CRITERIA);
 
   // Carrega o selo e o rascunho salvo (se houver)
@@ -130,7 +138,6 @@ export function SelfAssessmentPage() {
     setSaveStatus('idle'); // Reseta o status de salvo ao digitar
   };
 
-  // --- ATUALIZADO ---
   // Atualiza os arquivos para o passo (critério) atual
   const handleFilesChange = (newFiles: File[]) => {
     if (!assessment) return;
@@ -144,7 +151,6 @@ export function SelfAssessmentPage() {
     });
     setSaveStatus('idle');
   };
-  // --- FIM DA ATUALIZAÇÃO ---
 
 
   // --- Funções de Navegação e Ação ---
@@ -157,7 +163,7 @@ export function SelfAssessmentPage() {
 
   const prevStep = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep(currentStep + 1);
     }
   };
 
@@ -211,6 +217,36 @@ export function SelfAssessmentPage() {
 
   // --- Renderização ---
 
+  // --- LÓGICA DA PONTUAÇÃO TOTAL ---
+  const { totalScoreAcquired, totalPossibleScore } = useMemo(() => {
+    if (!assessment) {
+      return { totalScoreAcquired: 0, totalPossibleScore: 0 };
+    }
+
+    let acquired = 0;
+    let possible = 0;
+
+    // Itera sobre todas as respostas da avaliação
+    assessment.answers.forEach(answer => {
+      // Encontra o critério correspondente na lista de critérios mocados
+      const criterionData = allCriteria.find(c => c.descricao === answer.criterion);
+      // Pega o peso (pontuação) desse critério. Se não achar, é 0.
+      const weight = criterionData?.peso ?? 0;
+
+      // O total possível é a soma de todos os pesos
+      possible += weight; 
+
+      // O total adquirido só soma se o campo de texto da resposta NÃO estiver vazio
+      if (answer.responseText.trim() !== '') {
+        acquired += weight;
+      }
+    });
+
+    return { totalScoreAcquired: acquired, totalPossibleScore: possible };
+  }, [assessment, allCriteria]); // Recalcula quando a avaliação (respostas) ou critérios mudarem
+  // --- FIM DA LÓGICA ---
+
+
   if (isLoading || !assessment || !badge) {
     return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
   }
@@ -218,10 +254,9 @@ export function SelfAssessmentPage() {
   const currentCriterionAnswer = assessment.answers[currentStep];
   const totalSteps = assessment.answers.length;
 
-  // --- LÓGICA DA PONTUAÇÃO ---
-  // Encontra o critério correspondente para pegar o peso
+  // --- LÓGICA DA PONTUAÇÃO (Peso da pergunta atual) ---
   const currentCriterionData = allCriteria.find(c => c.descricao === currentCriterionAnswer.criterion);
-  const currentWeight = currentCriterionData?.peso ?? 0; // "Pontuação (Peso)"
+  const currentWeight = currentCriterionData?.peso ?? 0;
   // --- FIM DA LÓGICA ---
 
   return (
@@ -242,16 +277,27 @@ export function SelfAssessmentPage() {
               <div className="flex justify-between items-center mb-1">
                 <p className="text-sm font-semibold text-blue-700">PASSO {currentStep + 1} DE {totalSteps}</p>
                
-                {/* Visualização da Pontuação (Peso) */}
+                {/* Visualização da Pontuação (Peso) da Pergunta Atual */}
                 {currentWeight > 0 && (
-                  <div className="flex items-center space-x-1 text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
+                  <div className="flex items-center space-x-1 text-gray-700 bg-yellow-100 px-3 py-1 rounded-full border border-yellow-200">
                     <Star size={16} className="text-yellow-500 fill-yellow-500" />
-                    <span className="font-semibold text-sm">Peso {currentWeight}</span>
+                    <span className="font-semibold text-sm text-yellow-800">Vale {currentWeight} pontos</span>
                   </div>
                 )}
               </div>
               <h2 className="text-2xl font-bold text-gray-800">{currentCriterionAnswer.criterion}</h2>
               {/* --- FIM DO BLOCO --- */}
+
+              {/* --- SEÇÃO DE PONTUAÇÃO TOTAL (MODIFICADA) --- */}
+              <div className="mt-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 className="text-base font-semibold text-blue-800">Sua Pontuação Preliminar</h3>
+                <div className="flex items-baseline space-x-2 text-gray-600">
+                  <span className="text-3xl font-bold text-blue-700">{totalScoreAcquired}</span>
+                  <span className="text-lg font-medium text-gray-500">/ {totalPossibleScore} pontos totais</span>
+                </div>
+                <p className="text-sm text-gray-500">Sua pontuação aumenta ao preencher cada critério respondido.</p>
+              </div>
+              {/* --- FIM DA SEÇÃO --- */}
             
           </div>
 
@@ -271,7 +317,7 @@ export function SelfAssessmentPage() {
               />
          </div>
 
-            {/* Campo de Upload (ATUALIZADO) */}
+            {/* Campo de Upload */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Anexar Evidências (Opcional)
