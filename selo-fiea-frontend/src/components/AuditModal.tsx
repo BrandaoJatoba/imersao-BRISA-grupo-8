@@ -76,7 +76,8 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
       title: newTopicTitle,
       description: newTopicDesc,
       scoreLevel: 0, 
-      auditorId: null, 
+      auditorId: null,
+      parecer: '', // <<<--- CORREÇÃO ADICIONADA AQUI
     };
     setFormData(prev => ({ ...prev, topics: [...prev.topics, newTopic] }));
     setNewTopicTitle("");
@@ -92,7 +93,7 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
 
   const handleTopicChange = (
     topicId: string,
-    field: 'auditorId' | 'scoreLevel',
+    field: 'auditorId' | 'scoreLevel', // O campo 'parecer' não é editável aqui
     value: string | number
   ) => {
     setFormData(prev => ({

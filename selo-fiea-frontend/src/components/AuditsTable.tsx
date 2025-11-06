@@ -1,4 +1,4 @@
-import { Edit, Trash2, FileCheck, Clock } from 'lucide-react';
+import { Edit, Trash2, FileCheck, Clock, ClipboardList } from 'lucide-react'; // NOVO ÍCONE
 import type { Audit } from '../pages/AuditsPage';
 import type { User } from '../pages/AuditsPage';
 
@@ -7,9 +7,10 @@ interface AuditsTableProps {
     users: User[]; 
     onEdit: (audit: Audit) => void;
     onDelete: (auditId: number) => void;
+    onParecer: (audit: Audit) => void; 
 }
 
-export function AuditsTable({ audits, users, onEdit, onDelete }: AuditsTableProps) {
+export function AuditsTable({ audits, users, onEdit, onDelete, onParecer }: AuditsTableProps) {
     
     const getAuditorName = (id: number | null) => {
         if (!id) return <span className="text-gray-400">N/A</span>;
@@ -46,11 +47,31 @@ export function AuditsTable({ audits, users, onEdit, onDelete }: AuditsTableProp
                             <td className="text-left py-3 px-4">{getStatusChip(audit.status)}</td>
                             <td className="text-left py-3 px-4">{getAuditorName(audit.mainAuditorId)}</td>
                             <td className="text-left py-3 px-4">{audit.topics.length}</td>
-                            <td className="text-left py-3 px-4">
-                              <button onClick={() => onEdit(audit)} className="text-blue-600 hover:text-blue-800 mr-4">
+                            <td className="text-left py-3 px-4 flex items-center space-x-4">
+                                {/* botão parecer */}
+                                <button 
+                                  onClick={() => onParecer(audit)} 
+                                  className="text-gray-600 hover:text-gray-900"
+                                  title="Registrar Parecer"
+                                >
+                                    <ClipboardList size={20} />
+                                </button>
+                                
+                                {/* Botão Editar */}
+                                <button 
+                                  onClick={() => onEdit(audit)} 
+                                  className="text-blue-600 hover:text-blue-800"
+                                  title="Editar Configuração"
+                                >
                                     <Edit size={20} />
                                 </button>
-                                <button onClick={() => onDelete(audit.id)} className="text-red-600 hover:text-red-800">
+                                
+                                {/* Botão Deletar */}
+                                <button 
+                                  onClick={() => onDelete(audit.id)} 
+                                  className="text-red-600 hover:text-red-800"
+                                  title="Excluir Auditoria"
+                                >
                                     <Trash2 size={20} />
                                 </button>
                             </td>
