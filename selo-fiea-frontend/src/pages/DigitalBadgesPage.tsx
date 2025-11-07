@@ -21,25 +21,25 @@ interface DigitalBadge {
 // Reutilizando um selo de BadgesPage
 const MOCKED_BADGE: Badge = {
   id: 1,
-  name: 'Selo FIEA de Excelência 2024',
+  name: 'Selo FIEA de Excelência 2025',
   description: 'Concedido a empresas com excelência em gestão, sustentabilidade ambiental e inovação tecnológica.',
   validadeMeses: 12,
-  dataInicioEmissao: new Date('2024-01-01'),
-  dataFimEmissao: new Date('2024-12-31'),
+  dataInicioEmissao: new Date(2025, 0, 1),
+  dataFimEmissao: new Date(2025, 11, 31),
   icon: badgeIcon,
   criteria: ['Qualidade de Gestão', 'Sustentabilidade Ambiental', 'Inovação Tecnológica']
 };
 
 // Reutilizando empresas de MyCompaniesPage
-const MOCKED_COMPANIES: Company[] = [
+export const MOCKED_COMPANIES: Company[] = [
   { id: 1, razao_social: 'Indústria Alfa Ltda.', nome_fantasia: 'Alfa Metais', cnpj: '00.000.000/0001-00', setor: 'Metalurgia', porte: 'Médio', status: 'Ativa', endereco: 'Rua das Industias, Maceió - AL', email: 'contato@alfametais.com.br', telefone: '(11) 11111-1111' },
   { id: 2, razao_social: 'Indústria Beta Ltda.', nome_fantasia: 'Beta Alimentos', cnpj: '11.111.111/0001-11', setor: 'Alimentício', porte: 'Grande', status: 'Ativa', endereco: 'Rua das Industias, Maceió - AL', email: 'contato@betaalimentos.com.br', telefone: '(22) 22222-2222' },
 ];
 
 // Selos emitidos para as empresas
-const MOCKED_ISSUED_BADGES: DigitalBadge[] = [
-  { id: 'issued-001', badge: MOCKED_BADGE, company: MOCKED_COMPANIES[0], issueDate: new Date('2024-03-15') },
-  { id: 'issued-002', badge: MOCKED_BADGE, company: MOCKED_COMPANIES[1], issueDate: new Date('2024-04-01') },
+export const MOCKED_ISSUED_BADGES: DigitalBadge[] = [
+  { id: 'issued-001', badge: MOCKED_BADGE, company: MOCKED_COMPANIES[0], issueDate: new Date(2025, 0, 1) },
+  { id: 'issued-002', badge: MOCKED_BADGE, company: MOCKED_COMPANIES[1], issueDate: new Date(2024, 0, 1) },
 ];
 
 
