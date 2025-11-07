@@ -144,7 +144,7 @@ export function DashboardPage() {
                         {/* Card de Relatórios (Desativado - Único na Versão 2) */}
                         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 flex flex-col items-start opacity-50 cursor-not-allowed">
                             <div className="bg-orange-100 text-orange-700 p-3 rounded-full mb-4">
-                                <FileText size={32} /> {/* Reutilizando o ícone, se necessário, ou trocando por um de relatório */}
+                                <FileText size={32} />
                             </div>
                             <h3 className="text-xl font-bold text-gray-800 mb-2">Relatórios</h3>
                             <p className="text-gray-600 mb-4">Visualize os relatórios de auditoria e conformidade.</p>

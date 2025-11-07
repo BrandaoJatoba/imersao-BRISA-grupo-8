@@ -15,6 +15,8 @@ import { AuditsPage } from './pages/AuditsPage';
 import { IndustryDashboardPage } from './pages/IndustryDashboardPage';
 import { SelfAssessmentPage } from './pages/SelfAssessmentPage';
 import { MyCompaniesPage } from './pages/MyCompaniesPage';
+import { DigitalBadgesPage } from './pages/DigitalBadgesPage';
+import { BadgeVerificationPage } from './pages/BadgeVerificationPage';
 
 function App() {
   return (
@@ -25,7 +27,8 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/admin-register" element={<AdminRegistrationPage />} />
-      <Route path="register" element={<ManagerRegistrationPage />} />
+      <Route path="/register" element={<ManagerRegistrationPage />} />
+      <Route path="/verificacao/:verificationId" element={<BadgeVerificationPage />} />
 
       {/* Rotas Protegidas (Admin) */}
       <Route path="/dashboard" element={<DashboardPage />} />
@@ -38,6 +41,7 @@ function App() {
       <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
       <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
       <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
+      <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
     </Routes>
   )
 }
