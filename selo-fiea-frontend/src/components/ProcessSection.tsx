@@ -1,3 +1,5 @@
+// selo-fiea-frontend/src/components/ProcessSection.tsx
+
 import { Award } from 'lucide-react';
 
 export function ProcessSection() {

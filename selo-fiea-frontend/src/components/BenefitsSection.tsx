@@ -1,3 +1,5 @@
+// selo-fiea-frontend/src/components/BenefitsSection.tsx
+
 import { CheckCircle2 } from 'lucide-react';
 
 export function BenefitsSection() {

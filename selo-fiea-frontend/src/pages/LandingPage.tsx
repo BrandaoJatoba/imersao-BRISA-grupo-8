@@ -1,3 +1,5 @@
+// selo-fiea-frontend/src/pages/LandingPage.tsx
+
 import { AboutSection } from "../components/AboutSection";
 import { BenefitsSection } from "../components/BenefitsSection";
 import { ContactSection } from "../components/ContactSection";

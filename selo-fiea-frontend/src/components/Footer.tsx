@@ -1,3 +1,5 @@
+// selo-fiea-frontend/src/components/Footer.tsx
+
 export function Footer() {
   return (
     <footer className="bg-gray-800 text-white">

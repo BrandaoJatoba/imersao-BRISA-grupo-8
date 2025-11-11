@@ -1,3 +1,5 @@
+// selo-fiea-frontend/src/components/ContactSection.tsx
+
 export function ContactSection() {
   return (
     <section id="contato" className="py-20 bg-gray-50">

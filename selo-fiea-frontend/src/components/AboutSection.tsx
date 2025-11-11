@@ -1,3 +1,5 @@
+// selo-fiea-frontend/src/components/AboutSection.tsx
+
 import { Award, Leaf, Cpu } from 'lucide-react';
 
 export function AboutSection() {

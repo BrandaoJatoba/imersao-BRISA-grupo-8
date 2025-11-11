@@ -52,11 +52,18 @@ Atualmente nós estamos usando:
 - npm
 
 ### Instalação
+
 ```cd selo-fiea-frontend```
 
 ```npm install```
 
 ```npm run dev```
+
+O "login" só pode ser feito usando as credenciais:
+
+```gestor@selofiea.com.br```
+
+ ```Password@123```
 
 ## 4) Rotas
 Atualmente temos as seguintes rotas configuradas em ```src/App.tsx```:
