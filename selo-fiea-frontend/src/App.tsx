@@ -1,7 +1,5 @@
-// selo-fiea-frontend/src/App.tsx
-
 import { Routes, Route } from 'react-router-dom';
-import  LandingPage  from './pages/LandingPage';
+import LandingPage from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
@@ -18,32 +16,39 @@ import { MyCompaniesPage } from './pages/MyCompaniesPage';
 import { DigitalBadgesPage } from './pages/DigitalBadgesPage';
 import { BadgeVerificationPage } from './pages/BadgeVerificationPage';
 
+import { PublicLayout } from './layouts/PublicLayout';
+import { AdminLayout } from './layouts/AdminLayout';
+import { IndustryLayout } from './layouts/IndustryLayout';
+
 function App() {
-  return (
-    <Routes>
-      {/* Rotas Públicas */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/admin-register" element={<AdminRegistrationPage />} />
-      <Route path="/register" element={<ManagerRegistrationPage />} />
-      <Route path="/verificacao/:verificationId" element={<BadgeVerificationPage />} />
+  return (
+    <Routes>
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/admin-register" element={<AdminRegistrationPage />} />
+        <Route path="/register" element={<ManagerRegistrationPage />} />
+        <Route path="/verificacao/:verificationId" element={<BadgeVerificationPage />} />
+      </Route>
 
-      {/* Rotas Protegidas (Admin) */}
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/dashboard/perfis" element={<ProfilesPage />} />
-      <Route path="/dashboard/selos" element={<BadgesPage />} />
-      <Route path="/dashboard/auditorias" element={<AuditsPage />} />
-      <Route path="/dashboard/criterios" element={<CriteriaPage />} />
+      <Route element={<AdminLayout />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/perfis" element={<ProfilesPage />} />
+        <Route path="/dashboard/selos" element={<BadgesPage />} />
+        <Route path="/dashboard/auditorias" element={<AuditsPage />} />
+        <Route path="/dashboard/criterios" element={<CriteriaPage />} />
+      </Route>
 
-      {/* NOVAS Rotas Protegidas (Indústria) */}
-      <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
-      <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
-      <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
-      <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
-    </Routes>
-  )
+      <Route element={<IndustryLayout />}>
+        <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
+        <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
+        <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
+        <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
+      </Route>
+    </Routes>
+  )
 }
 
 export default App;
