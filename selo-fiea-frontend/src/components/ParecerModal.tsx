@@ -47,7 +47,7 @@ export function ParecerModal({ audit, onClose, onSave }: ParecerModalProps) {
     });
   };
   
-  // Calcula a pontuação total
+  // Calcula a pontuação total (baseada na nota do AUDITOR)
   const totalScore = topics.reduce((acc, topic) => acc + topic.scoreLevel, 0);
   const maxScore = topics.length * 4; // Nível 4 é o máximo por tópico
 
@@ -67,14 +67,14 @@ export function ParecerModal({ audit, onClose, onSave }: ParecerModalProps) {
         <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto">
           <div className="p-6 space-y-6">
             
-            {/* Bloco de Pontuação Total */}
+            {/* Bloco de Pontuação Total (do Auditor) */}
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 className="text-base font-semibold text-blue-800">Pontuação Total da Auditoria</h3>
+                <h3 className="text-base font-semibold text-blue-800">Pontuação Total (Auditor)</h3>
                 <div className="flex items-baseline space-x-2 text-gray-600">
                   <span className="text-3xl font-bold text-blue-700">{totalScore}</span>
                   <span className="text-lg font-medium text-gray-500">/ {maxScore} pontos</span>
                 </div>
-                <p className="text-sm text-gray-500">A pontuação é baseada no Nível (0-4) de cada tópico.</p>
+                <p className="text-sm text-gray-500">A pontuação é baseada no Nível (0-4) de cada tópico definido pelo auditor.</p>
             </div>
 
             {/* Lista de Tópicos para Avaliação */}
@@ -88,10 +88,30 @@ export function ParecerModal({ audit, onClose, onSave }: ParecerModalProps) {
                       {topic.description && <p className="text-sm text-gray-600">{topic.description}</p>}
                     </div>
                     
-                    {/* Campos de Score e Parecer */}
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    {/* Bloco de Resposta da Empresa (Autoavaliação) - NOVO */}
+                    <div className="border border-blue-200 bg-blue-100 p-3 rounded-md space-y-2">
+                      <h5 className="text-sm font-semibold text-blue-800">Resposta da Empresa (Autoavaliação)</h5>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Pontuação Informada</label>
+                          <div className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg">
+                            Nível {topic.companySelfScore}
+                          </div>
+                        </div>
+                        <div className="md:col-span-3">
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Parecer da Empresa</label>
+                          <div className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg min-h-[60px]">
+                            {topic.companyParecer || <span className="text-gray-400">Nenhum parecer informado.</span>}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Campos de Score e Parecer (Auditor) - ATUALIZADO */}
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 pt-2">
                       <div className="md:col-span-2">
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Pontuação (Nível)</label>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Pontuação do Auditor (Nível)</label>
                         <select
                           value={topic.scoreLevel}
                           onChange={e => handleTopicChange(topic.id, 'scoreLevel', e.target.value)}
@@ -105,7 +125,7 @@ export function ParecerModal({ audit, onClose, onSave }: ParecerModalProps) {
                         </select>
                       </div>
                       <div className="md:col-span-3">
-                         <label className="block text-xs font-medium text-gray-600 mb-1">Parecer do Tópico</label>
+                         <label className="block text-xs font-medium text-gray-600 mb-1">Parecer do Auditor</label>
                          <textarea
                             value={topic.parecer}
                             onChange={e => handleTopicChange(topic.id, 'parecer', e.target.value)}

@@ -22,9 +22,16 @@ export interface AuditTopic {
   id: string;
   title: string;
   description: string;
-  scoreLevel: 0 | 1 | 2 | 3 | 4;
+
+  // Resposta da Empresa (Autoavaliação)
+  companySelfScore: 0 | 1 | 2 | 3 | 4; 
+  companyParecer: string;
+  // companyFiles: File[]; // (Pode ser adicionado no futuro)
+
+  // Resposta do Auditor
+  scoreLevel: 0 | 1 | 2 | 3 | 4; // Nota do auditor
   auditorId: number | null;
-  parecer: string;
+  parecer: string; // Parecer do auditor
 }
 
 
@@ -60,8 +67,30 @@ export const MOCKED_AUDITS: Audit[] = [
     documents: [],
     status: 'em_analise',
     topics: [
-      { id: 't1', title: 'Controle de Documentos', description: 'Verificar versão e aprovação.', scoreLevel: 0, auditorId: 102, parecer: '' },
-      { id: 't2', title: 'Gestão de Riscos', description: 'Verificar matriz de riscos.', scoreLevel: 0, auditorId: null, parecer: 'Ainda não avaliado.' },
+      { 
+        id: 't1', 
+        title: 'Controle de Documentos', 
+        description: 'Verificar versão e aprovação.', 
+        // Resposta Empresa
+        companySelfScore: 4, 
+        companyParecer: 'Todos os nossos documentos estão na versão 3.0, aprovados pela diretoria, conforme anexo.', 
+        // Resposta Auditor
+        scoreLevel: 0, 
+        auditorId: 102, 
+        parecer: '' 
+      },
+      { 
+        id: 't2', 
+        title: 'Gestão de Riscos', 
+        description: 'Verificar matriz de riscos.', 
+        // Resposta Empresa
+        companySelfScore: 3,
+        companyParecer: 'Matriz de risco atualizada, porém falta aprovação formal da gerência de operações.',
+        // Resposta Auditor
+        scoreLevel: 0, 
+        auditorId: null, 
+        parecer: 'Ainda não avaliado.' 
+      },
     ],
     parecerFinal: '',
   },
@@ -73,7 +102,18 @@ export const MOCKED_AUDITS: Audit[] = [
     documents: [],
     status: 'conforme',
     topics: [
-        { id: 't3', title: 'Descarte de Resíduos', description: 'Verificar logística reversa.', scoreLevel: 4, auditorId: 102, parecer: 'Processo 100% conforme.' }
+        { 
+          id: 't3', 
+          title: 'Descarte de Resíduos', 
+          description: 'Verificar logística reversa.', 
+          // Resposta Empresa
+          companySelfScore: 4,
+          companyParecer: 'Implementamos 100% da logística reversa para todos os resíduos químicos.',
+          // Resposta Auditor
+          scoreLevel: 4, 
+          auditorId: 102, 
+          parecer: 'Processo 100% conforme.' 
+        }
     ],
     parecerFinal: 'A empresa demonstrou total conformidade com os requisitos ambientais avaliados. Recomendada para certificação.',
   },
@@ -85,7 +125,18 @@ export const MOCKED_AUDITS: Audit[] = [
     documents: [],
     status: 'nao_conforme',
     topics: [
-        { id: 't4', title: 'Uso de EPIs', description: 'Verificar uso no chão de fábrica.', scoreLevel: 1, auditorId: 101, parecer: 'Uso inconsistente de luvas.' }
+        { 
+          id: 't4', 
+          title: 'Uso de EPIs', 
+          description: 'Verificar uso no chão de fábrica.', 
+          // Resposta Empresa
+          companySelfScore: 2,
+          companyParecer: 'Houve falha na distribuição de luvas no setor B, mas já foi corrigido.',
+          // Resposta Auditor
+          scoreLevel: 1, 
+          auditorId: 101, 
+          parecer: 'Uso inconsistente de luvas. A falha persiste.' 
+        }
     ],
     parecerFinal: 'A auditoria encontrou falhas graves no uso de EPIs, resultando em não conformidade. Ações corretivas são urgentes.',
   },
@@ -161,9 +212,13 @@ export function AuditsPage() {
       description: formData.description,
       mainAuditorId: formData.mainAuditorId,
       documents: formData.documents,
-      topics: formData.topics,
+      topics: formData.topics.map(t => ({ // Garante que os campos da empresa existam, mesmo que vazios
+        ...t,
+        companySelfScore: t.companySelfScore || 0,
+        companyParecer: t.companyParecer || '',
+      })),
       status: finalStatus,
-      parecerFinal: editingAudit ? editingAudit.parecerFinal : '', // Adicionado
+      parecerFinal: editingAudit ? editingAudit.parecerFinal : '',
     };
 
 
@@ -252,5 +307,3 @@ export function AuditsPage() {
     </div>
   );
 }
-
-
