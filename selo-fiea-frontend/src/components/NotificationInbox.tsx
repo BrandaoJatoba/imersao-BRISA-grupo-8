@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNotifications } from '../hooks/useNotifications';
 import { Notification } from './Notification';
+import './Notification.css'; 
 
 interface NotificationInboxProps {
   isOpen: boolean;

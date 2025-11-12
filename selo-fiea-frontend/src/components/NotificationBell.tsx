@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNotifications } from '../hooks/useNotifications';
+import './Notification.css'; 
 
 interface NotificationBellProps {
   onClick: () => void;
