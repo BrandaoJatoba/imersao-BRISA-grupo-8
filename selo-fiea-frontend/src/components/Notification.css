@@ -1,109 +1,196 @@
-.notification-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
+/* --- Área do Header (Onde o Sino Fica) --- */
+.notification-header-area {
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: flex-end;
+  padding: 12px 32px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid #e0e0e0;
+  position: relative; /* Necessário para o posicionamento da Inbox */
 }
 
-.notification {
-  min-width: 250px;
-  max-width: 400px;
-  padding: 16px;
+/* --- Ícone do Sino (Bell) --- */
+.notification-bell {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4a4a4a;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.notification-bell:hover {
+  color: #000;
+  background-color: #f0f0f0;
+}
+
+.notification-bell svg {
+  display: block;
+}
+
+/* --- Contagem (Badge) --- */
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: #D32F2F; /* Vermelho para destaque */
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff; /* Borda da cor do fundo do header */
+}
+
+/* --- A Caixa de Notificações (Inbox) --- */
+.notification-inbox {
+  position: absolute;
+  top: 65px; /* Posição logo abaixo do header */
+  right: 32px;
+  width: 380px;
+  max-height: 450px;
+  background: #ffffff;
   border-radius: 8px;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e0e0e0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Para o border-radius funcionar no header da inbox */
+}
+
+/* --- Header da Inbox --- */
+.inbox-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.inbox-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.inbox-clear-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  opacity: 0;
-  transform: translateX(100%);
+  padding: 4px;
 }
 
-.notification.enter {
-  animation: slideIn 0.3s forwards;
+.inbox-clear-btn:hover {
+  text-decoration: underline;
 }
 
-.notification.exit {
-  animation: slideOut 0.3s forwards;
+/* --- Lista de Itens --- */
+.inbox-list {
+  max-height: 380px;
+  overflow-y: auto;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.inbox-empty {
+  text-align: center;
+  color: #777;
+  padding: 48px 16px;
+  font-size: 14px;
 }
 
-@keyframes slideOut {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(100%);
-  }
+/* --- Item de Notificação Individual --- */
+.notification-item {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background-color 0.2s;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item:hover {
+  background-color: #f9f9f9;
+}
+
+/* Ícone de status (círculo colorido) */
+.notification-item::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.notification-item.success::before { background-color: #28a745; }
+.notification-item.error::before { background-color: #dc3545; }
+.notification-item.info::before { background-color: #17a2b8; }
+
+.notification-message {
+  flex-grow: 1;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+  padding-right: 8px;
 }
 
 .notification-close-btn {
   background: none;
   border: none;
-  color: inherit;
-  font-size: 20px;
-  margin-left: 16px;
-  padding: 0;
+  font-size: 22px;
+  color: #aaa;
   cursor: pointer;
-  opacity: 0.7;
+  padding: 0 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.2s;
 }
 
 .notification-close-btn:hover {
-  opacity: 1;
+  color: #555;
 }
 
-.notification.success {
-  background-color: #28a745;
-}
 
-.notification.error {
-  background-color: #dc3545;
-}
+/* --- VARIAÇÕES DE PERFIL --- */
 
-.notification.info {
-  background-color: #17a2b8;
-}
+/* Admin */
+.notification-bell.admin { color: #1976D2; }
+.notification-bell.admin:hover { background-color: #e3f2fd; }
+.notification-bell.admin .notification-badge { background-color: #D32F2F; border-color: #fff; }
+.notification-inbox.admin .inbox-header { background-color: #1976D2; }
+.notification-inbox.admin .inbox-header h3 { color: #fff; }
+.notification-inbox.admin .inbox-clear-btn { color: #fff; opacity: 0.8; }
+.notification-inbox.admin .inbox-clear-btn:hover { opacity: 1; }
 
-.notification.notification-admin.success {
-  background-color: #1976D2;
-}
-.notification.notification-admin.error {
-  background-color: #D32F2F;
-}
-.notification.notification-admin.info {
-  background-color: #FFC107;
-  color: #333;
-}
-.notification.notification-admin .notification-close-btn {
-  color: inherit;
-}
+/* Industry */
+.notification-bell.industry { color: #00796B; }
+.notification-bell.industry:hover { background-color: #e0f2f1; }
+.notification-bell.industry .notification-badge { background-color: #E64A19; border-color: #fff; }
+.notification-inbox.industry .inbox-header { background-color: #00796B; }
+.notification-inbox.industry .inbox-header h3 { color: #fff; }
+.notification-inbox.industry .inbox-clear-btn { color: #fff; opacity: 0.8; }
+.notification-inbox.industry .inbox-clear-btn:hover { opacity: 1; }
 
-.notification.notification-industry.success {
-  background-color: #00796B;
-}
-.notification.notification-industry.error {
-  background-color: #E64A19;
-}
-.notification.notification-industry.info {
-  background-color: #689F38;
-}
-
-.notification.notification-public {
-  background-color: #555;
-}
+/* Public */
+.notification-bell.public { color: #555; }
+.notification-bell.public:hover { background-color: #f0f0f0; }
+.notification-bell.public .notification-badge { background-color: #dc3545; border-color: #fff; }
+.notification-inbox.public .inbox-header { background-color: #f5f5f5; }
+.notification-inbox.public .inbox-header h3 { color: #333; }
+.notification-inbox.public .inbox-clear-btn { color: #007bff; }

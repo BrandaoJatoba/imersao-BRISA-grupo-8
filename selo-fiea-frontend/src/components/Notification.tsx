@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNotifications } from '../hooks/useNotifications';
 
 interface NotificationProps {
@@ -10,32 +10,20 @@ interface NotificationProps {
 
 export const Notification: React.FC<NotificationProps> = ({ id, message, type, variant }) => {
   const { removeNotification } = useNotifications();
-  const [exiting, setExiting] = useState(false);
 
-  const handleClose = () => {
-    setExiting(true);
-    setTimeout(() => {
-      removeNotification(id);
-    }, 300);
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    removeNotification(id);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      handleClose();
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const variantClass = `notification-${variant}`;
   
   return (
-    <div 
-      className={`notification ${type} ${variantClass} ${exiting ? 'exit' : 'enter'}`}
-      onClick={handleClose}
-    >
-      {message}
-      <button className="notification-close-btn">&times;</button>
+    <div className={`notification-item ${type} ${variantClass}`}>
+      <span className="notification-message">{message}</span>
+      <button className="notification-close-btn" onClick={handleClose}>
+        &times;
+      </button>
     </div>
   );
 };

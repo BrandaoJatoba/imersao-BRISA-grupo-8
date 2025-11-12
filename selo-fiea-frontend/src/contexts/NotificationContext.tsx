@@ -11,6 +11,7 @@ interface NotificationContextData {
   notifications: Notification[];
   addNotification: (message: string, type: 'success' | 'error' | 'info') => void;
   removeNotification: (id: number) => void;
+  clearNotifications: () => void;
 }
 
 export const NotificationContext = createContext<NotificationContextData | undefined>(undefined);
@@ -26,11 +27,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     const id = new Date().getTime();
     const newNotification = { id, message, type };
     
-    setNotifications(prevNotifications => [...prevNotifications, newNotification]);
-
-    setTimeout(() => {
-      removeNotification(id);
-    }, 5000);
+    setNotifications(prevNotifications => [newNotification, ...prevNotifications]);
   }, []);
 
   const removeNotification = useCallback((id: number) => {
@@ -39,8 +36,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     );
   }, []);
 
+  const clearNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
   return (
-    <NotificationContext.Provider value={{ notifications, addNotification, removeNotification }}>
+    <NotificationContext.Provider value={{ notifications, addNotification, removeNotification, clearNotifications }}>
       {children}
     </NotificationContext.Provider>
   );
