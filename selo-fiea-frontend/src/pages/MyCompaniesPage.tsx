@@ -111,6 +111,7 @@ export function MyCompaniesPage() {
           <div className="container mx-auto px-6 py-4">
             <Link to="/industry/dashboard/" className="text-sm font-semibold text-blue-600 hover:underline">← Voltar para o Portal</Link>
             <h1 className="text-3xl font-bold text-gray-800 mt-2">Minhas Empresas</h1>
+            <p className="text-gray-600 mt-1">Visualize e gerencie as informações das empresas cadastradas.</p>
           </div>
         </header>
 
