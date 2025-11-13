@@ -17,6 +17,7 @@ import { SelfAssessmentPage } from './pages/SelfAssessmentPage';
 import { MyCompaniesPage } from './pages/MyCompaniesPage';
 import { DigitalBadgesPage } from './pages/DigitalBadgesPage';
 import { BadgeVerificationPage } from './pages/BadgeVerificationPage';
+import { AvailableBadgesPage } from './pages/AvailableBadgesPage';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
       <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
       <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
       <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
+      <Route path="/industry/dashboard/selos-disponiveis" element={<AvailableBadgesPage />} />
     </Routes>
   )
 }
