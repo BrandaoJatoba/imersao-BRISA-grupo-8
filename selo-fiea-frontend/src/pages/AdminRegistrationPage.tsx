@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { LoginHeader } from "../components/LoginHeader";
 import { Footer } from "../components/Footer";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { apiClient } from "../services/apiClient";
 
 export function AdminRegistrationPage() {
   const [name, setName] = useState('');
@@ -58,19 +59,31 @@ export function AdminRegistrationPage() {
       return;
     }
 
-    // ! Chamar a API de cadastro do back-end aqui
-    console.log("Tentativa de cadastro com:", { name, email, phone, password });
+    try {
+      // API REAL
+      // Monta o payload assumindo que o endpoint /auth/register
+      // aceita um objeto de usuário e um tipo/role.
+      const payload = {
+        user: {
+          name,
+          email,
+          phone,
+          password,
+          role: 'admin' // Especifica a role para o backend
+        },
+        // Sem dados da empresa para o admin
+      };
 
-    // Simulação de chamada de API
-    await new Promise(resolve => setTimeout(resolve, 1500));
+      await apiClient.publicPost('/auth/register', payload);
 
-    // Exemplo de mensagem de sucesso
-    setMessage('Cadastro realizado com sucesso!');
+      setMessage('Cadastro de administrador realizado com sucesso!');
 
-    // Exemplo de como lidar com erro (ex: e-mail já existe)
-    // setError('Este e-mail já está em uso. Tente outro.');
-
-    setIsLoading(false);
+    } catch (err: any) {
+      console.error('Falha no cadastro de admin:', err);
+      setError(err.message || 'Erro ao realizar cadastro.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const PolicyItem = ({ met, text }: { met: boolean; text: string }) => (
@@ -117,8 +130,8 @@ export function AdminRegistrationPage() {
                 <ul className="space-y-1">
                   <PolicyItem met={policy.minLength} text="A senha deve conter pelo menos 8 caracteres" />
                   <PolicyItem met={policy.uppercase} text="Uma letra maiúscula" />
-                  <PolicyItem met={policy.lowercase} text="Uma letra minúscula" />     
-                  <PolicyItem met={policy.number} text="Um número" />                                                                 
+                  <PolicyItem met={policy.lowercase} text="Uma letra minúscula" />                  
+                  <PolicyItem met={policy.number} text="Um número" />                                                  
                   <PolicyItem met={policy.specialChar} text="Um caractere especial (!@#$...)" />
                 </ul>
               </div>

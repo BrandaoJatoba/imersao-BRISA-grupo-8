@@ -1,21 +1,17 @@
+// selo-fiea-frontend/src/pages/BadgeVerificationPage.tsx
+
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ShieldCheck, ShieldAlert, Award, Building } from 'lucide-react';
 import { LoginHeader } from "../components/LoginHeader";
-import { MOCKED_ISSUED_BADGES as allIssuedBadges, MOCKED_COMPANIES } from "./DigitalBadgesPage";
+import { apiClient } from "../services/apiClient"; // Importa o cliente
 
 interface DigitalBadge {
   id: string;
   badge: { name: string; validadeMeses: number };
   company: { nome_fantasia: string; cnpj: string };
-  issueDate: Date;
+  issueDate: string; 
 }
-
-// Adicionando um selo expirado para teste, usando os dados centralizados
-const MOCKED_ISSUED_BADGES = [
-    ...allIssuedBadges,
-    { id: 'issued-expired', badge: allIssuedBadges[0].badge, company: MOCKED_COMPANIES[1], issueDate: new Date('2022-01-20') },
-]
 
 export function BadgeVerificationPage() {
   const { verificationId } = useParams<{ verificationId: string }>();
@@ -24,35 +20,52 @@ export function BadgeVerificationPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    // ! Simula a busca na API pelo ID do selo emitido
-    const found = MOCKED_ISSUED_BADGES.find(b => b.id === verificationId);
-
-    if (found) {
-      const expiryDate = new Date(found.issueDate);
-      expiryDate.setMonth(expiryDate.getMonth() + found.badge.validadeMeses);
+    const verifyBadge = async () => {
+      if (!verificationId) {
+        setIsValid(false);
+        setIsLoading(false);
+        return;
+      }
       
-      setIssuedBadge(found);
-      setIsValid(new Date() < expiryDate); // Verifica se a data atual é menor que a de expiração
-    } else {
-      setIssuedBadge(null);
-      setIsValid(false);
-    }
+      setIsLoading(true);
+      try {
+        // API REAL (PÚBLICA)
+        const found: DigitalBadge = await apiClient.publicGet(`/selos-emitidos/validar/${verificationId}`);
+        
+        setIssuedBadge(found);
 
-    setIsLoading(false);
+        // Lógica de validação
+        const issueDate = new Date(found.issueDate);
+        const expiryDate = new Date(issueDate);
+        expiryDate.setMonth(expiryDate.getMonth() + found.badge.validadeMeses);
+        
+        setIsValid(new Date() < expiryDate);
+        
+      } catch (error) {
+        console.error("Falha ao verificar selo:", error);
+        setIssuedBadge(null);
+        setIsValid(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    verifyBadge();
   }, [verificationId]);
 
   const expiryDate = issuedBadge ? new Date(issuedBadge.issueDate) : null;
   if (expiryDate && issuedBadge) {
     expiryDate.setMonth(expiryDate.getMonth() + issuedBadge.badge.validadeMeses);
   }
+  const issueDate = issuedBadge ? new Date(issuedBadge.issueDate) : null;
+
 
   const renderContent = () => {
     if (isLoading) {
       return <p className="text-center text-gray-600">Verificando...</p>;
     }
 
-    if (isValid && issuedBadge) {
+    if (isValid && issuedBadge && issueDate && expiryDate) {
       return (
         <div className="text-center">
           <ShieldCheck className="mx-auto h-16 w-16 text-green-600" />
@@ -63,8 +76,8 @@ export function BadgeVerificationPage() {
             <p className="mt-2 flex items-center gap-2 text-gray-700"><Building size={18} /> Concedido a: <span className="font-semibold">{issuedBadge.company.nome_fantasia}</span></p>
             <p className="mt-1 text-sm text-gray-500">CNPJ: {issuedBadge.company.cnpj}</p>
             <div className="mt-4 border-t pt-4 space-y-2 text-sm">
-              <p className="flex justify-between"><span>Data de Emissão:</span> <strong>{issuedBadge.issueDate.toLocaleDateString('pt-BR')}</strong></p>
-              <p className="flex justify-between"><span>Data de Validade:</span> <strong>{expiryDate?.toLocaleDateString('pt-BR')}</strong></p>
+              <p className="flex justify-between"><span>Data de Emissão:</span> <strong>{issueDate.toLocaleDateString('pt-BR')}</strong></p>
+              <p className="flex justify-between"><span>Data de Validade:</span> <strong>{expiryDate.toLocaleDateString('pt-BR')}</strong></p>
             </div>
           </div>
         </div>
