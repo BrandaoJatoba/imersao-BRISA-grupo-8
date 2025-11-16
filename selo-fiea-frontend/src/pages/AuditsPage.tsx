@@ -1,32 +1,32 @@
 // selo-fiea-frontend/src/pages/AuditsPage.tsx
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PlusCircle, FileText } from 'lucide-react';
 import { AuditsTable } from "../components/AuditsTable";
 import { AuditModal, type AuditFormData } from "../components/AuditModal";
 import { ParecerModal } from "../components/ParecerModal";
-
+import { apiClient } from "../services/apiClient"; 
+import { useNotifications } from "../hooks/useNotifications"; // para feedback
 
 // --- Tipos de Dados ---
-
 
 // Usuários (Auditores)
 export interface User {
   id: number;
   name: string;
+  // se for preciso for, adicionar outros campos de usuário que a API /users retorna
 }
-
 
 // Tópicos de Auditoria
 export interface AuditTopic {
-  id: string;
+  id: string; // Pode ser string (temp) ou number (da API)
   title: string;
   description: string;
 
   // Resposta da Empresa (Autoavaliação)
   companySelfScore: 0 | 1 | 2 | 3 | 4; 
   companyParecer: string;
-  // companyFiles: File[]; // (Pode ser adicionado no futuro)
 
   // Resposta do Auditor
   scoreLevel: 0 | 1 | 2 | 3 | 4; // Nota do auditor
@@ -34,215 +34,208 @@ export interface AuditTopic {
   parecer: string; // Parecer do auditor
 }
 
-
 // Auditoria (Entidade Principal)
 export interface Audit {
   id: number;
   title: string;
   description: string;
   mainAuditorId: number | null;
-  documents: File[];
+  documents: File[]; // esse campo pode não ser mapeado 1:1 com a API
   topics: AuditTopic[];
   status: 'em_analise' | 'conforme' | 'nao_conforme';
   parecerFinal: string;
 }
-
-
-// --- Dados Mocados (Simulando API) ---
-
-
-const MOCKED_AUDITORS: User[] = [
-  { id: 101, name: 'Odilon Nascimento' },
-  { id: 102, name: 'Maria Silva' },
-  { id: 103, name: 'Carlos Souza' },
-];
-
-
-export const MOCKED_AUDITS: Audit[] = [
-  {
-    id: 1,
-    title: 'Auditoria de Qualidade ISO 9001 - 2024',
-    description: 'Verificação dos processos de qualidade da Indústria X.',
-    mainAuditorId: 101,
-    documents: [],
-    status: 'em_analise',
-    topics: [
-      { 
-        id: 't1', 
-        title: 'Controle de Documentos', 
-        description: 'Verificar versão e aprovação.', 
-        // Resposta Empresa
-        companySelfScore: 4, 
-        companyParecer: 'Todos os nossos documentos estão na versão 3.0, aprovados pela diretoria, conforme anexo.', 
-        // Resposta Auditor
-        scoreLevel: 0, 
-        auditorId: 102, 
-        parecer: '' 
-      },
-      { 
-        id: 't2', 
-        title: 'Gestão de Riscos', 
-        description: 'Verificar matriz de riscos.', 
-        // Resposta Empresa
-        companySelfScore: 3,
-        companyParecer: 'Matriz de risco atualizada, porém falta aprovação formal da gerência de operações.',
-        // Resposta Auditor
-        scoreLevel: 0, 
-        auditorId: null, 
-        parecer: 'Ainda não avaliado.' 
-      },
-    ],
-    parecerFinal: '',
-  },
-  {
-    id: 2,
-    title: 'Auditoria Ambiental ISO 14001 - 2024',
-    description: 'Verificação de conformidade ambiental.',
-    mainAuditorId: 102,
-    documents: [],
-    status: 'conforme',
-    topics: [
-        { 
-          id: 't3', 
-          title: 'Descarte de Resíduos', 
-          description: 'Verificar logística reversa.', 
-          // Resposta Empresa
-          companySelfScore: 4,
-          companyParecer: 'Implementamos 100% da logística reversa para todos os resíduos químicos.',
-          // Resposta Auditor
-          scoreLevel: 4, 
-          auditorId: 102, 
-          parecer: 'Processo 100% conforme.' 
-        }
-    ],
-    parecerFinal: 'A empresa demonstrou total conformidade com os requisitos ambientais avaliados. Recomendada para certificação.',
-  },
-  {
-    id: 3,
-    title: 'Auditoria de Segurança do Trabalho',
-    description: 'Análise de NRs.',
-    mainAuditorId: 101,
-    documents: [],
-    status: 'nao_conforme',
-    topics: [
-        { 
-          id: 't4', 
-          title: 'Uso de EPIs', 
-          description: 'Verificar uso no chão de fábrica.', 
-          // Resposta Empresa
-          companySelfScore: 2,
-          companyParecer: 'Houve falha na distribuição de luvas no setor B, mas já foi corrigido.',
-          // Resposta Auditor
-          scoreLevel: 1, 
-          auditorId: 101, 
-          parecer: 'Uso inconsistente de luvas. A falha persiste.' 
-        }
-    ],
-    parecerFinal: 'A auditoria encontrou falhas graves no uso de EPIs, resultando em não conformidade. Ações corretivas são urgentes.',
-  },
-];
-
 
 export function AuditsPage() {
   const [audits, setAudits] = useState<Audit[]>([]);
   const [auditors, setAuditors] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAudit, setEditingAudit] = useState<Audit | null>(null);
-
-
   const [isParecerModalOpen, setIsParecerModalOpen] = useState(false);
   const [auditForParecer, setAuditForParecer] = useState<Audit | null>(null);
+  const [isLoading, setIsLoading] = useState(false); 
+  const { addNotification } = useNotifications();
 
+  // Função para carregar os dados
+  const fetchAudits = async () => {
+    setIsLoading(true);
+    try {
+      const auditsData = await apiClient.get('/auditorias');
+      // A API /auditorias pode não retornar os tópicos,
+      // podemos precisar de chamadas adicionais se quisermos exibir a contagem
+      setAudits(auditsData);
+    } catch (error: any) {
+      addNotification(`Erro ao carregar auditorias: ${error.message}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchAuditors = async () => {
+    try {
+      // assumindo que /users retorna a lista de auditores
+      const auditorsData = await apiClient.get('/users');
+      setAuditors(auditorsData);
+    } catch (error: any) {
+      addNotification(`Erro ao carregar auditores: ${error.message}`, 'error');
+    }
+  };
 
   useEffect(() => {
-    setAudits(MOCKED_AUDITS);
-    setAuditors(MOCKED_AUDITORS);
-  }, []);
-
+    fetchAudits();
+    fetchAuditors();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Disabilita o aviso de dependência para addNotification
 
   const handleOpenModal = (audit: Audit | null) => {
     setEditingAudit(audit);
     setIsModalOpen(true);
   };
 
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingAudit(null);
   };
 
-
   const handleOpenParecerModal = (audit: Audit) => {
-    setAuditForParecer(audit);
-    setIsParecerModalOpen(true);
-  };
+    // A API de auditoria pode não retornar os tópicos na listagem principal.
+    // Precisamos buscar os tópicos da auditoria selecionada *antes* de abrir o modal.
+    const fetchAuditDetails = async () => {
+      setIsLoading(true);
+      try {
+        // 1. Busca a auditoria completa
+        const auditDetails = await apiClient.get(`/auditorias/${audit.id}`);
+        // 2. Busca os tópicos associados
+        const topicsData = await apiClient.get(`/auditorias/topicos-pontuacao?auditId=${audit.id}`); // Assumindo query param
+        
+        // Combina os dados
+        const auditWithTopics = {
+          ...auditDetails,
+          topics: topicsData || [],
+        };
 
+        setAuditForParecer(auditWithTopics);
+        setIsParecerModalOpen(true);
+      } catch (error: any) {
+        addNotification(`Erro ao carregar detalhes da auditoria: ${error.message}`, 'error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAuditDetails();
+  };
 
   const handleCloseParecerModal = () => {
     setIsParecerModalOpen(false);
     setAuditForParecer(null);
   };
 
-
-  const handleSaveParecer = (updatedAudit: Audit) => {
-    // ! Chamar a API de PUT/PATCH para salvar os pareceres e notas
-    setAudits(audits.map(a => a.id === updatedAudit.id ? updatedAudit : a));
-    console.log('Salvando pareceres e notas:', updatedAudit);
-    handleCloseParecerModal();
+  // Salva os pareceres (lógica complexa da API)
+  const handleSaveParecer = async (updatedAudit: Audit) => {
+    setIsLoading(true);
+    try {
+      // 1. Avaliar cada Tópico em loop
+      for (const topic of updatedAudit.topics) {
+        const topicEvaluationPayload = {
+          // Ajuste o payload conforme o DTO do backend
+          topicId: topic.id, 
+          scoreLevel: topic.scoreLevel,
+          parecer: topic.parecer,
+          auditorId: topic.auditorId,
+        };
+        await apiClient.post(
+          `/auditorias/${updatedAudit.id}/avaliar-topico`, 
+          topicEvaluationPayload
+        );
+      }
+      
+      // 2. Salvar o Parecer Final
+      await apiClient.post(
+        `/auditorias/${updatedAudit.id}/parecer`, 
+        { parecerFinal: updatedAudit.parecerFinal }
+      );
+      
+      addNotification('Parecer salvo com sucesso!', 'success');
+      handleCloseParecerModal();
+      fetchAudits(); // Recarrega a lista
+      
+    } catch (error: any) {
+      addNotification(`Falha ao salvar parecer: ${error.message}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // Salva a auditoria (lógica complexa da API)
+  const handleSaveAudit = async (formData: AuditFormData) => {
+    setIsLoading(true);
+    try {
+      // 1. Criar/Atualizar a Auditoria principal
+      const auditPayload = {
+        title: formData.title,
+        description: formData.description,
+        mainAuditorId: formData.mainAuditorId,
+        status: formData.status,
+      };
 
-  const handleSaveAudit = (formData: AuditFormData) => {
-    const { topics, status } = formData;
-    let finalStatus = status;
+      let savedAudit: Audit;
 
+      if (editingAudit) {
+        savedAudit = await apiClient.patch(`/auditorias/${formData.id}`, auditPayload);
+        // NOTA: a api não parece suportar a atualização de tópicos por aqui
+        // a edição de tópicos (adicionar/remover) deve ser um fluxo separado
+        // o modal de edição, por ora, só edita os dados principais
+      } else {
+        // Criando uma nova auditoria
+        savedAudit = await apiClient.post('/auditorias', auditPayload);
 
-    if (status !== 'em_analise' && topics.length > 0) {
-      const totalScore = topics.reduce((acc, topic) => acc + topic.scoreLevel, 0);
-      const maxScore = topics.length * 4;
-      const percentage = (totalScore / maxScore) * 100;
-      finalStatus = percentage >= 75 ? 'conforme' : 'nao_conforme';
+        // 2. Criar os Tópicos em loop
+        for (const topic of formData.topics) {
+          const topicPayload = {
+            auditId: savedAudit.id, // Linka o tópico à auditoria criada
+            title: topic.title,
+            description: topic.description,
+            // (outros campos do DTO 'topicos-pontuacao')
+          };
+          await apiClient.post('/auditorias/topicos-pontuacao', topicPayload);
+        }
+      }
+      
+      // 3. Lidar com Upload de Documentos
+      // A API de evidências (/evidences/upload) não parece ligada a 'auditorias',
+      // mas sim a 'selfAssessmentId' ou 'questionId'.
+      // Portanto, o upload de 'documents' da auditoria principal é pulado.
+      if (formData.documents.length > 0) {
+        console.warn('O upload de documentos da auditoria principal não foi implementado (API endpoint ausente).');
+        // Se o endpoint existisse (ex: /auditorias/:id/upload), seria:
+        // const docFormData = new FormData();
+        // formData.documents.forEach(file => docFormData.append('files', file));
+        // await apiClient.upload(`/auditorias/${savedAudit.id}/upload`, docFormData);
+      }
+      
+      addNotification(editingAudit ? 'Auditoria atualizada!' : 'Auditoria criada!', 'success');
+      handleCloseModal();
+      fetchAudits(); 
+
+    } catch (error: any) {
+      addNotification(`Falha ao salvar auditoria: ${error.message}`, 'error');
+    } finally {
+      setIsLoading(false);
     }
-
-
-    //  Preserva o parecerFinal ao editar, ou inicia vazio ao criar
-    const savedAudit: Audit = {
-      id: formData.id,
-      title: formData.title,
-      description: formData.description,
-      mainAuditorId: formData.mainAuditorId,
-      documents: formData.documents,
-      topics: formData.topics.map(t => ({ // Garante que os campos da empresa existam, mesmo que vazios
-        ...t,
-        companySelfScore: t.companySelfScore || 0,
-        companyParecer: t.companyParecer || '',
-      })),
-      status: finalStatus,
-      parecerFinal: editingAudit ? editingAudit.parecerFinal : '',
-    };
-
-
-    // ! Chamar a API de POST (criar) ou PUT (atualizar)
-    if (editingAudit) {
-      setAudits(audits.map(a => a.id === savedAudit.id ? savedAudit : a));
-      console.log('Atualizando auditoria:', savedAudit);
-    } else {
-      const newAudit = { ...savedAudit, id: Math.max(0, ...audits.map(a => a.id)) + 1 };
-      setAudits([...audits, newAudit]);
-      console.log('Criando nova auditoria:', newAudit);
-    }
-    handleCloseModal();
   };
 
-
-  const handleDeleteAudit = (auditId: number) => {
-    // ! Chamar a API de DELETE
+  const handleDeleteAudit = async (auditId: number) => {
     if (window.confirm("Tem certeza que deseja deletar esta auditoria?")) {
-      setAudits(audits.filter(a => a.id !== auditId));
-      console.log('Deletando auditoria com ID:', auditId);
+      try {
+        await apiClient.delete(`/auditorias/${auditId}`);
+        addNotification('Auditoria deletada com sucesso.', 'success');
+        setAudits(audits.filter(a => a.id !== auditId));
+      } catch (error: any) {
+        addNotification(`Falha ao deletar auditoria: ${error.message}`, 'error');
+      }
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -253,7 +246,6 @@ export function AuditsPage() {
           <p className="text-gray-600 mt-1">Crie e acompanhe os processos de auditoria das indústrias.</p>
         </div>
       </header>
-
 
       <main className="container mx-auto px-6 py-8">
         <div className="flex justify-end mb-6">
@@ -266,9 +258,10 @@ export function AuditsPage() {
           </button>
         </div>
 
-
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-          {audits.length > 0 ? (
+          {isLoading && audits.length === 0 ? (
+            <p className="text-center text-gray-500 py-12">Carregando auditorias...</p>
+          ) : audits.length > 0 ? (
             <AuditsTable
               audits={audits}
               users={auditors}
@@ -286,7 +279,6 @@ export function AuditsPage() {
         </div>
       </main>
 
-
       {isModalOpen && (
         <AuditModal
           audit={editingAudit}
@@ -295,7 +287,6 @@ export function AuditsPage() {
           onSave={handleSaveAudit}
         />
       )}
-
 
       {isParecerModalOpen && auditForParecer && (
         <ParecerModal
