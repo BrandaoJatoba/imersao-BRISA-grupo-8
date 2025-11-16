@@ -1,72 +1,102 @@
-# Design do Sistema — Certificação de Indústrias com Selo FIEA de Excelência e Inovação
+# Lista de endpoints e rotas implementadas 
 
-> **Stack alvo**: Front-end em **React** (TypeScript) e back-end em **Python** (FastAPI ou Django REST Framework), banco **PostgreSQL** e implantação em contêineres (**Docker** + **Kubernetes** ou Docker Compose para MVP).
+# Lista de Endpoints - Selo FIEA Backend
+
+## Autenticação
+- `POST /auth/register` - Registrar usuário ✅ (AdminRegistrationPage.tsx, ManagerRegistrationPage.tsx)
+- `POST /auth/login` - Login ✅ (AuthForm.tsx)
+- `POST /auth/forgot-password` - Solicitar recuperação de senha ✅ (ForgotPasswordPage.tsx)
+- `POST /auth/reset-password` - Redefinir senha ✅ (ResetPasswordPage.tsx)
+
+## Usuários
+- `GET /users` - Listar usuários
+- `GET /users/:id` - Buscar por ID
+- `PATCH /users/:id` - Atualizar
+- `DELETE /users/:id` - Deletar
+
+## Empresas
+- `POST /empresas` - Criar
+- `GET /empresas` - Listar
+- `GET /empresas/:id` - Buscar por ID
+- `GET /empresas/cnpj/:cnpj` - Buscar por CNPJ
+- `PATCH /empresas/:id` - Atualizar
+- `PATCH /empresas/:id/toggle-active` - Ativar/Desativar
+- `DELETE /empresas/:id` - Deletar
+
+## Selos (Tipos)
+- `POST /selos` - Criar tipo de selo ✅ (BadgesPage.tsx)
+- `GET /selos` - Listar 🚧 (BadgesPage.tsx)
+- `GET /selos/:id` - Buscar por ID 
+- `PATCH /selos/:id` - Atualizar ✅ (BadgesPage.tsx)
+- `DELETE /selos/:id` - Deletar ✅ (BadgesPage.tsx)
+
+## Critérios
+- `POST /criteria` - Criar ✅ (CriteriaPage.tsx)
+- `GET /criteria` - Listar (query: ?seloId=X) 🚧 (BadgesPage.tsx, CriteriaPage.tsx)
+- `GET /criteria/:id` - Buscar por ID
+- `PATCH /criteria/:id` - Atualizar ✅ (CriteriaPage.tsx)
+- `DELETE /criteria/:id` - Deletar ✅ (CriteriaPage.tsx)
+
+## Perguntas
+- `POST /questions` - Criar
+- `GET /questions` - Listar (query: ?criterionId=X)
+- `GET /questions/:id` - Buscar por ID
+- `PATCH /questions/:id` - Atualizar
+- `DELETE /questions/:id` - Deletar
+
+## Ciclos de Certificação
+- `POST /certification-cycles` - Criar
+- `GET /certification-cycles` - Listar (query: ?seloId=X)
+- `GET /certification-cycles/:id` - Buscar por ID
+- `PATCH /certification-cycles/:id` - Atualizar
+- `DELETE /certification-cycles/:id` - Deletar
+
+## Autoavaliações
+- `POST /self-assessments` - Criar
+- `GET /self-assessments` - Listar (query: ?cycleId=X ou ?userId=X)
+- `GET /self-assessments/:id` - Buscar por ID
+- `PATCH /self-assessments/:id` - Atualizar
+- `POST /self-assessments/:id/submit` - Submeter (envia email)
+- `DELETE /self-assessments/:id` - Deletar
+
+## Evidências
+- `POST /evidences/upload` - Upload (query: ?questionId=X ou ?selfAssessmentId=X)
+- `GET /evidences` - Listar (query: ?questionId=X ou ?selfAssessmentId=X)
+- `GET /evidences/:id` - Buscar por ID
+- `GET /evidences/:id/download` - Download
+- `DELETE /evidences/:id` - Deletar
+
+## Auditorias (Sistema de Pontuação)
+- `POST /auditorias` - Criar
+- `POST /auditorias/topicos-pontuacao` - Criar tópico 
+- `GET /auditorias/topicos-pontuacao` - Listar tópicos
+- `POST /auditorias/:id/avaliar-topico` - Avaliar tópico
+- `POST /auditorias/:id/parecer` - Submeter parecer final
+- `GET /auditorias` - Listar 🚧 (DashboardPage.tsx)
+- `GET /auditorias/:id` - Buscar por ID
+- `PATCH /auditorias/:id` - Atualizar
+- `DELETE /auditorias/:id` - Deletar
+
+## Audit Findings (Achados/Pareceres)
+- `POST /audit-findings` - Criar
+- `GET /audit-findings` - Listar todos
+- `GET /audit-findings?auditId=:id` - Listar por auditoria
+- `GET /audit-findings/:id` - Buscar por ID
+- `PATCH /audit-findings/:id` - Atualizar
+- `DELETE /audit-findings/:id` - Deletar
+
+## Selos Emitidos
+- `POST /selos-emitidos/emitir` - Emitir (via Auditoria)
+- `GET /selos-emitidos/validar/:id` - **PÚBLICO** - Validar selo ✅ (BadgeVerificationPage.tsx)
+- `GET /selos-emitidos` - Listar
+- `GET /selos-emitidos/empresa/:empresaId` - Listar por empresa ✅ (DigitalBadgesPage.tsx)
+- `GET /selos-emitidos/:id` - Buscar por ID
+- `PATCH /selos-emitidos/:id/revogar` - Revogar
+- `POST /selos-emitidos/verificar-expirados` - Verificar expirados
+- `GET /selos-emitidos/:id/certificado` - Visualizar certificado
 
 ---
 
-## 1) Visão Geral
-Um sistema web para gerenciar o ciclo completo do **Selo FIEA**: cadastro de indústrias, autoavaliações, auditorias externas, emissão/renovação do selo, trilhas de capacitação, relatórios e dashboards para FIEA e empresas.
+**Base URL (Dev):** `http://localhost:3000/api/v1`
 
-### Objetivos
-- Facilitar e padronizar o **processo de certificação** (autoavaliação → auditoria → emissão → renovação).
-- Promover **boas práticas** em sustentabilidade, qualidade, eficiência e inovação.
-- Oferecer **transparência** para empresas e para a FIEA via relatórios e dashboards.
-
-### Escopo (MVP → Evoluções)
-- **MVP**: gestão de empresas e usuários; questionários de autoavaliação; fluxo de auditoria externa; emissão do selo (digital); dashboard básico; relatórios essenciais; notificações por e-mail; área de capacitação com upload de materiais.
-- **V1.1**: portal público de consulta de empresas certificadas; integração com assinatura digital; trilhas de capacitação estruturadas; exportações (CSV/PDF) e relatórios customizáveis.
-- **V1.2**: analytics avançados, benchmarking setorial, API pública de verificação do selo, webhooks para integrações.
-
----
- 
- # Documentação Front-end
-
- O front-end está sendo desenvolvido utilizando React, TypeScript e Vite. O projeto consiste em uma Single Page Application (SPA) com rotas para a página de apresentação e para a área de autenticação.
-
-## 1) Tecnologias
-Atualmente nós estamos usando:
-- Vite
-- React 19
-- TypeScript
-- Tailwind CSS v4
-- React Router DOM
-- Lucide React
-
- ## 2) Estrutura do projeto 
-```
- /selo-fiea-frontend
-├── src/
-│   ├── components/      # Componentes reutilizáveis (Header, Footer, AuthForm...)
-│   ├── pages/           # Componentes de página (LandingPage, LoginPage)
-│   ├── App.tsx          # Configuração principal das rotas da aplicação
-│   ├── main.tsx         # Ponto de entrada da aplicação (renderiza o App)
-│   └── index.css        # Estilos globais e configuração do Tailwind
-├── package.json         # Dependências e scripts do projeto
-└── vite.config.ts       # Configuração do Vite e do plugin do Tailwind
-```
-
-## 3) Execução
-
-### Pré-requisitos 
-- Node.js
-- npm
-
-### Instalação
-
-```cd selo-fiea-frontend```
-
-```npm install```
-
-```npm run dev```
-
-O "login" só pode ser feito usando as credenciais:
-
-```gestor@selofiea.com.br```
-
- ```Password@123```
-
-## 4) Rotas
-Atualmente temos as seguintes rotas configuradas em ```src/App.tsx```:
-- ```/```: Renderiza o componente ```LandingPage.tsx```
-- ```/login```: Renderiza o componente ```LoginPage.tsx```
-    - Essa cujo tambem aceita um parâmetro de busca ```?tab=register``` (por exemplo: ```/login?tab=register```) para abrir diretamente na aba de cadastro
+**Autenticação:** Bearer Token (exceto `/selos-emitidos/validar/:id`)
