@@ -85,7 +85,7 @@ export function AuditsPage() {
     fetchAudits();
     fetchAuditors();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // Disabilita o aviso de dependência para addNotification
+  // desabilita o aviso de dependência para addNotification
 
   const handleOpenModal = (audit: Audit | null) => {
     setEditingAudit(audit);
@@ -98,8 +98,8 @@ export function AuditsPage() {
   };
 
   const handleOpenParecerModal = (audit: Audit) => {
-    // A API de auditoria pode não retornar os tópicos na listagem principal.
-    // Precisamos buscar os tópicos da auditoria selecionada *antes* de abrir o modal.
+    // a api de auditoria pode não retornar os tópicos na listagem principal
+    // precisamos buscar os tópicos da auditoria selecionada ANTES de abrir o modal.
     const fetchAuditDetails = async () => {
       setIsLoading(true);
       try {
@@ -131,14 +131,13 @@ export function AuditsPage() {
     setAuditForParecer(null);
   };
 
-  // Salva os pareceres (lógica complexa da API)
+  // Salva os pareceres
   const handleSaveParecer = async (updatedAudit: Audit) => {
     setIsLoading(true);
     try {
-      // 1. Avaliar cada Tópico em loop
+      // avaliar cada Tópico em loop
       for (const topic of updatedAudit.topics) {
         const topicEvaluationPayload = {
-          // Ajuste o payload conforme o DTO do backend
           topicId: topic.id, 
           scoreLevel: topic.scoreLevel,
           parecer: topic.parecer,
@@ -150,7 +149,7 @@ export function AuditsPage() {
         );
       }
       
-      // 2. Salvar o Parecer Final
+      // Salvar o Parecer Final
       await apiClient.post(
         `/auditorias/${updatedAudit.id}/parecer`, 
         { parecerFinal: updatedAudit.parecerFinal }
@@ -158,7 +157,7 @@ export function AuditsPage() {
       
       addNotification('Parecer salvo com sucesso!', 'success');
       handleCloseParecerModal();
-      fetchAudits(); // Recarrega a lista
+      fetchAudits(); 
       
     } catch (error: any) {
       addNotification(`Falha ao salvar parecer: ${error.message}`, 'error');
@@ -203,12 +202,12 @@ export function AuditsPage() {
       }
       
       // 3. Lidar com Upload de Documentos
-      // A API de evidências (/evidences/upload) não parece ligada a 'auditorias',
+      // a api de evidências (/evidences/upload) não parece ligada a 'auditorias',
       // mas sim a 'selfAssessmentId' ou 'questionId'.
-      // Portanto, o upload de 'documents' da auditoria principal é pulado.
+      // portanto, o upload de 'documents' da auditoria principal é pulado.
       if (formData.documents.length > 0) {
         console.warn('O upload de documentos da auditoria principal não foi implementado (API endpoint ausente).');
-        // Se o endpoint existisse (ex: /auditorias/:id/upload), seria:
+        // se o endpoint existisse (ex: /auditorias/:id/upload), seria:
         // const docFormData = new FormData();
         // formData.documents.forEach(file => docFormData.append('files', file));
         // await apiClient.upload(`/auditorias/${savedAudit.id}/upload`, docFormData);
