@@ -1,7 +1,6 @@
 // selo-fiea-frontend/src/services/apiClient.ts
 
-// A URL base da sua API
-const BASE_URL = 'http://localhost:3000/api/v1';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * Obtém o token de autenticação salvo no localStorage.
