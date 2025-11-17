@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Award, Building, Calendar, ShieldCheck, ShieldAlert } from 'lucide-react';
 import type { Badge } from "./BadgesPage";
-import type { Company } from "../components/CompanyModal";
+import type { Company } from "../types/company";
 import { apiClient } from "../services/apiClient"; 
 import { useNotifications } from "../hooks/useNotifications";
 
@@ -15,6 +15,7 @@ interface DigitalBadge {
   badge: Badge; // Dados do tipo de selo
   company: Company; // Dados da empresa
   issueDate: string; // Data de emissão (string ISO)
+  verificationUrl: string; // URL para verificação pública
   // adicionamos 'expiryDate' se a API já calcular
 }
 
@@ -75,7 +76,7 @@ export function DigitalBadgesPage() {
   const handleDownloadQr = (issued: DigitalBadge) => {
     // Lógica para gerar e baixar o QR Code.
     // Por enquanto, apenas um alerta para simular a ação.
-    alert(`Simulando download do QR Code para o selo da empresa ${issued.company.nome_fantasia}.
+    alert(`Simulando download do QR Code para o selo da empresa ${issued.company.nomeFantasia}.
 URL: ${window.location.origin}${issued.verificationUrl}`);
   };
 
@@ -117,7 +118,7 @@ URL: ${window.location.origin}${issued.verificationUrl}`);
                   </h2>
                   <p className="text-lg font-semibold text-gray-700 mt-2 mb-4 flex items-center gap-2">
                     <Building size={18} className="text-gray-500" />
-                    {issued.company.nome_fantasia}
+                    {issued.company.nomeFantasia}
                   </p>
 
                   <div className="text-sm text-gray-600 space-y-2 w-full border-t pt-4">
