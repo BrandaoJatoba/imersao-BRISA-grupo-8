@@ -5,14 +5,19 @@ import { Link } from "react-router-dom";
 import { LoginHeader } from "../components/LoginHeader";
 import { Footer } from "../components/Footer";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { apiClient } from "../services/apiClient"; 
 
 export function ManagerRegistrationPage() {
   // Campos da empresa
   const [razaoSocial, setRazaoSocial] = useState('');
   const [nomeFantasia, setNomeFantasia] = useState('');
   const [cnpj, setCnpj] = useState('');
-  const [cnae, setCnae] = useState('');
+  const [cnae, setCnae] = useState(''); // CNAE não está na API de /empresas, mas vou manter
   const [endereco, setEndereco] = useState('');
+  const [setor, setSetor] = useState(''); 
+  const [porte, setPorte] = useState<'Pequeno' | 'Médio' | 'Grande'>('Pequeno'); 
+  const [telefoneEmpresa, setTelefoneEmpresa] = useState(''); 
+  const [emailEmpresa, setEmailEmpresa] = useState(''); 
 
   // Campos do gestor (usuário)
   const [responsavel, setResponsavel] = useState('');
@@ -68,20 +73,42 @@ export function ManagerRegistrationPage() {
       return;
     }
 
-    // ! Chamar a API de cadastro do back-end aqui
-    // O back-end deve validar se o CNPJ já existe para impedir duplicidade.
-    console.log("Tentativa de cadastro com:", { razaoSocial, nomeFantasia, cnpj, cnae, endereco, responsavel, email, phone, password });
+    try {
+      // API REAL
+      const payload = {
+        company: {
+          razao_social: razaoSocial,
+          nome_fantasia: nomeFantasia,
+          cnpj,
+          cnae, // Este campo não está na API de /empresas, mas estava no form
+          setor,
+          porte,
+          endereco,
+          email: emailEmpresa,
+          telefone: telefoneEmpresa,
+        },
+        user: {
+          name: responsavel,
+          email, // E-mail de login do gestor
+          phone, // Telefone do gestor
+          password,
+          role: 'industry' // Define a role
+        }
+      };
 
-    // Simulação de chamada de API
-    await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log("Tentativa de cadastro com:", payload);
 
-    // Exemplo de mensagem de sucesso
-    setMessage('Cadastro realizado com sucesso! Um e-mail de confirmação foi enviado.');
+      // Usando o endpoint público de registro
+      await apiClient.publicPost('/auth/register', payload);
 
-    // Exemplo de como lidar com erro (ex: CNPJ já existe)
-    // setError('Este CNPJ já está cadastrado em nosso sistema.');
+      setMessage('Cadastro realizado com sucesso! Um e-mail de confirmação pode ter sido enviado. Você já pode fazer o login.');
 
-    setIsLoading(false);
+    } catch (err: any) {
+      console.error("Falha no cadastro da indústria:", err);
+      setError(err.message || 'Erro ao realizar cadastro. Verifique se o CNPJ ou E-mail já estão em uso.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const PolicyItem = ({ met, text }: { met: boolean; text: string }) => (
@@ -113,34 +140,55 @@ export function ManagerRegistrationPage() {
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Dados da Empresa */}
-              <input type="text" value={razaoSocial} onChange={(e) => setRazaoSocial(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Razão Social" required disabled={isLoading} />
-              <input type="text" value={nomeFantasia} onChange={(e) => setNomeFantasia(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Nome Fantasia" required disabled={isLoading} />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" value={cnpj} onChange={(e) => setCnpj(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="CNPJ" required disabled={isLoading} />
-                <input type="text" value={cnae} onChange={(e) => setCnae(e.target.value.replace(/\D/g, ''))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="CNAE (apenas números)" required disabled={isLoading} />
-              </div>
-              <input type="text" value={endereco} onChange={(e) => setEndereco(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Endereço Completo" required disabled={isLoading} />
+              <fieldset className="border p-4 rounded-lg">
+                <legend className="text-lg font-semibold px-2">Dados da Empresa</legend>
+                <div className="space-y-4 p-2">
+                  <input type="text" value={razaoSocial} onChange={(e) => setRazaoSocial(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Razão Social" required disabled={isLoading} />
+                  <input type="text" value={nomeFantasia} onChange={(e) => setNomeFantasia(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Nome Fantasia" required disabled={isLoading} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" value={cnpj} onChange={(e) => setCnpj(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="CNPJ (XX.XXX.XXX/XXXX-XX)" required disabled={isLoading} />
+                    <input type="text" value={cnae} onChange={(e) => setCnae(e.target.value.replace(/\D/g, ''))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="CNAE (apenas números)" required disabled={isLoading} />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" value={setor} onChange={(e) => setSetor(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Setor de Atuação" required disabled={isLoading} />
+                    <select value={porte} onChange={(e) => setPorte(e.target.value as typeof porte)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required disabled={isLoading}>
+                      <option value="Pequeno">Pequeno Porte</option>
+                      <option value="Médio">Médio Porte</option>
+                      <option value="Grande">Grande Porte</option>
+                    </select>
+                  </div>
+                  <input type="text" value={endereco} onChange={(e) => setEndereco(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Endereço Completo" required disabled={isLoading} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="email" value={emailEmpresa} onChange={(e) => setEmailEmpresa(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="E-mail da Empresa" required disabled={isLoading} />
+                    <input type="tel" value={telefoneEmpresa} onChange={(e) => setTelefoneEmpresa(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Telefone da Empresa" required disabled={isLoading} />
+                  </div>
+                </div>
+              </fieldset>
               
               {/* Dados do Responsável */}
-              <hr className="my-4"/>
-              <input type="text" value={responsavel} onChange={(e) => setResponsavel(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus-border-blue-500" placeholder="Nome do Responsável" required disabled={isLoading} />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="E-mail de Acesso" required disabled={isLoading} />
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Telefone" required disabled={isLoading} />
-              </div>
+               <fieldset className="border p-4 rounded-lg">
+                <legend className="text-lg font-semibold px-2">Dados do Gestor (Login)</legend>
+                <div className="space-y-4 p-2">
+                  <input type="text" value={responsavel} onChange={(e) => setResponsavel(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus-border-blue-500" placeholder="Nome do Responsável" required disabled={isLoading} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="E-mail de Acesso (Login)" required disabled={isLoading} />
+                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Telefone do Responsável" required disabled={isLoading} />
+                  </div>
 
-              {/* Política de Senha */}
-              <div className="text-sm">
-                <ul className="space-y-1">
-                  <PolicyItem met={policy.minLength} text="A senha deve conter pelo menos 8 caracteres" />
-                  <PolicyItem met={policy.uppercase} text="Uma letra maiúscula" />
-                  <PolicyItem met={policy.lowercase} text="Uma letra minúscula" />     
-                  <PolicyItem met={policy.number} text="Um número" />                                                                 
-                  <PolicyItem met={policy.specialChar} text="Um caractere especial (!@#$...)" />
-                </ul>
-              </div>
-              <input type="password" value={password} onChange={handlePasswordChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Crie uma Senha" required disabled={isLoading} />
-              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Confirme sua Senha" required disabled={isLoading} />
+                  {/* Política de Senha */}
+                  <div className="text-sm">
+                    <ul className="space-y-1">
+                      <PolicyItem met={policy.minLength} text="A senha deve conter pelo menos 8 caracteres" />
+                      <PolicyItem met={policy.uppercase} text="Uma letra maiúscula" />
+                      <PolicyItem met={policy.lowercase} text="Uma letra minúscula" />    
+                      <PolicyItem met={policy.number} text="Um número" />                                        
+                      <PolicyItem met={policy.specialChar} text="Um caractere especial (!@#$...)" />
+                    </ul>
+                  </div>
+                  <input type="password" value={password} onChange={handlePasswordChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Crie uma Senha" required disabled={isLoading} />
+                  <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Confirme sua Senha" required disabled={isLoading} />
+                </div>
+              </fieldset>
               
               <div>
                 <button type="submit" className="w-full bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-800 transition-all shadow-sm disabled:bg-blue-400" disabled={isLoading}>

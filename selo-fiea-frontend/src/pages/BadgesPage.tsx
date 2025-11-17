@@ -5,8 +5,10 @@ import { Link } from "react-router-dom";
 import { PlusCircle, ShieldAlert } from 'lucide-react';
 import { BadgesTable } from "../components/BadgesTable"; 
 import { DynamicForm } from "../components/DynamicForm";
-import badgeIcon from '/badge.jpg';
-import { MOCKED_CRITERIA } from "./CriteriaPage";
+// import badgeIcon from '/badge.jpg'; 
+import { apiClient } from "../services/apiClient"; 
+import type { Criterion } from "./CriteriaPage"; 
+import { useNotifications } from "../hooks/useNotifications";
 
 // Tipos para os dados (TypeScript)
 export interface Badge {
@@ -14,36 +16,44 @@ export interface Badge {
   name: string;
   description: string;
   validadeMeses: number;
-  dataInicioEmissao: Date;
-  dataFimEmissao: Date;
-  icon: string; 
-  criteria: string[]; // Critérios para obter o selo
+  dataInicioEmissao: Date | string; // API pode mandar string
+  dataFimEmissao: Date | string; // API pode mandar string
+  icon: string; // Pode ser uma URL ou Base64
+  criteria: string[]; // Critérios (descrições) para obter o selo
 }
 
-// Dados mocados para simular a API
-const MOCKED_BADGES: Badge[] = [
-  { 
-    id: 1, 
-    name: 'Selo FIEA 2025', 
-    description: 'Concedido a empresas com excelência em gestão, sustentabilidade ambiental e inovação tecnológica.',
-    validadeMeses: 12,
-    dataInicioEmissao: new Date('2025-01-01'),
-    dataFimEmissao: new Date('2025-12-31'),
-    icon: badgeIcon,
-    criteria: ['Qualidade', 'Sustentabilidade', 'Inovação Tecnológica'] 
-  },
-];
+// (MOCKED_BADGES REMOVIDO)
 
 export function BadgesPage() {
   const [badges, setBadges] = useState<Badge[]>([]);
+  const [allCriteria, setAllCriteria] = useState<Criterion[]>([]); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { addNotification } = useNotifications();
+
+  // Função para buscar todos os dados
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      // Carrega Selos e Critérios em paralelo
+      const [badgesData, criteriaData] = await Promise.all([
+        apiClient.get('/selos'),
+        apiClient.get('/criteria')
+      ]);
+      setBadges(badgesData);
+      setAllCriteria(criteriaData);
+    } catch (error: any) {
+      addNotification(`Erro ao carregar dados: ${error.message}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Simula a busca de dados da API quando a página carrega
-  useEffect(() => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
-    // ! Substituir com chamadas reais à API (Ex: fetch('/api/badges'))
-    setBadges(MOCKED_BADGES);
-  }, []);
+  useEffect(() => {
+    fetchData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOpenModal = (badge: Badge | null) => {
     setEditingBadge(badge); // Se for null, é para criar. Se tiver dados, é para editar.
@@ -55,24 +65,34 @@ export function BadgesPage() {
     setEditingBadge(null);
   };
 
-  const handleSaveBadge = (badgeToSave: Badge) => {
-    // ! Chamar a API de POST (criar) ou PUT (atualizar)
-    if (editingBadge) { // Atualizando
-      setBadges(badges.map(b => b.id === badgeToSave.id ? badgeToSave : b));
-      console.log('Atualizando selo:', badgeToSave);
-    } else { // Criando
-      const newBadge = { ...badgeToSave, id: Math.max(0, ...badges.map(b => b.id)) + 1 }; // Simula a geração de um ID
-      setBadges([...badges, newBadge]);
-       console.log('Criando novo selo:', newBadge);
+  const handleSaveBadge = async (badgeToSave: Badge) => {
+    // O DynamicForm já converte o ícone para Base64 e formata as datas
+    try {
+      if (editingBadge) { 
+        const updatedBadge = await apiClient.patch(`/selos/${badgeToSave.id}`, badgeToSave);
+        setBadges(badges.map(b => b.id === updatedBadge.id ? updatedBadge : b));
+        addNotification('Selo atualizado com sucesso!', 'success');
+      } else { 
+        const { id, ...newBadgeData } = badgeToSave;
+        const newBadge = await apiClient.post('/selos', newBadgeData);
+        setBadges([...badges, newBadge]);
+        addNotification('Selo criado com sucesso!', 'success');
+      }
+      handleCloseModal();
+    } catch (error: any) {
+      addNotification(`Falha ao salvar selo: ${error.message}`, 'error');
     }
-    handleCloseModal();
   };
 
-  const handleDeleteBadge = (badgeId: number) => {
-    // ! Chamar a API de DELETE
+  const handleDeleteBadge = async (badgeId: number) => {
     if (window.confirm("Tem certeza que deseja deletar este selo?")) {
-      setBadges(badges.filter(b => b.id !== badgeId));
-      console.log('Deletando selo com ID:', badgeId);
+      try {
+        await apiClient.delete(`/selos/${badgeId}`);
+        setBadges(badges.filter(b => b.id !== badgeId));
+        addNotification('Selo deletado com sucesso.', 'success');
+      } catch (error: any) {
+        addNotification(`Falha ao deletar selo: ${error.message}`, 'error');
+      }
     }
   };
 
@@ -98,7 +118,9 @@ export function BadgesPage() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            {badges.length > 0 ? (
+            {isLoading ? (
+              <p className="text-center text-gray-500 py-12">Carregando selos...</p>
+            ) : badges.length > 0 ? (
                 <BadgesTable 
                     badges={badges}
                     onEdit={handleOpenModal}
@@ -117,7 +139,7 @@ export function BadgesPage() {
        {isModalOpen && (
           <DynamicForm
             badge={editingBadge}
-            allCriteria={MOCKED_CRITERIA}
+            allCriteria={allCriteria} // Passa os critérios carregados da API
             onClose={handleCloseModal}
             onSave={handleSaveBadge}
           />

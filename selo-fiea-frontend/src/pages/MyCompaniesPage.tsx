@@ -1,50 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "../components/Footer";
-import { PlusCircle } from "lucide-react";
-import { CompanyModal, type Company } from "../components/CompanyModal";
-
-
-// Dados mocados para simular a API
-const MOCKED_COMPANIES: Company[] = [
-  {
-    id: 1,
-    razao_social: 'Indústria Alfa Ltda.',
-    nome_fantasia: 'Alfa Metais',
-    cnpj: '00.000.000/0001-00',
-    setor: 'Metalurgia',
-    porte: 'Médio',
-    status: 'Ativa',
-    endereco: 'Rua das Industias - Distrito Industrial, Maceió - AL',
-    email: 'contato@alfametais.com.br',
-    telefone: '(11) 11111-1111'
-  },
-  {
-    id: 2,
-    razao_social: 'Indústria Beta Ltda.',
-    nome_fantasia: 'Beta Alimentos',
-    cnpj: '11.111.111/0001-11',
-    setor: 'Alimentício',
-    porte: 'Grande',
-    status: 'Ativa',
-    endereco: 'Rua das Industias - Distrito Industrial, Maceió - AL',
-    email: 'contato@betaalimentos.com.br',
-    telefone: '(22) 22222-2222'
-  },
-  {
-    id: 3,
-    razao_social: 'Indústria Gama Ltda.',
-    nome_fantasia: 'Gama Têxtil',
-    cnpj: '22.222.222/0001-22',
-    setor: 'Têxtil',
-    porte: 'Pequeno',
-    status: 'Desativada',
-    endereco: 'Rua das Industias - Distrito Industrial, Maceió - AL',
-    email: 'contato@gamatextil.com.br',
-    telefone: '(33) 33333-3333'
-  },
-];
-
+import { PlusCircle, ShieldAlert } from "lucide-react";
+import { CompanyModal } from "../components/CompanyModal";
+import {
+  listCompanies,
+  createCompany,
+  updateCompany,
+  toggleCompanyActiveStatus,
+} from "../services/CompanyServices";
+import type { Company } from "../types/company";
+import { useNotifications } from "../hooks/useNotifications";
 
 export function MyCompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -52,16 +18,15 @@ export function MyCompaniesPage() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
-
+  const { addNotification } = useNotifications();
 
   useEffect(() => {
-    const fetchCompanies = async () => {
+    const loadCompanies = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        // ! Substituir com chamada real à API para buscar as empresas
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simula delay da API
-        setCompanies(MOCKED_COMPANIES);
+        const data = await listCompanies();
+        setCompanies(data);
       } catch (err) {
         setError('Erro ao carregar as empresas.');
         console.error('Falha ao buscar empresas:', err);
@@ -70,8 +35,8 @@ export function MyCompaniesPage() {
       }
     };
 
-    fetchCompanies();
-  }, []);
+    loadCompanies();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOpenModal = (company: Company | null) => {
     setEditingCompany(company);
@@ -83,24 +48,48 @@ export function MyCompaniesPage() {
     setEditingCompany(null);
   };
 
-  const handleSaveCompany = (companyToSave: Company) => {
-    if (editingCompany) { // Editando
-      setCompanies(companies.map(c => c.id === companyToSave.id ? companyToSave : c));
-      console.log('Atualizando empresa:', companyToSave);
-    } else { // Criando
-      const newCompany = { ...companyToSave, id: Math.max(0, ...companies.map(c => c.id)) + 1 };
-      setCompanies([...companies, newCompany]);
-      console.log('Criando nova empresa:', newCompany);
+  const handleSaveCompany = async (companyToSave: Partial<Company>) => {
+    try {
+      if (editingCompany) { // Editando
+        if (!companyToSave.id) {
+          addNotification('Erro: ID da empresa não encontrado para atualização.', 'error');
+          return;
+        }
+        const updatedCompany = await updateCompany(companyToSave.id, companyToSave);
+        setCompanies(companies.map(c => c.id === updatedCompany.id ? updatedCompany : c));
+        addNotification('Empresa atualizada com sucesso!', 'success');
+      } else { // Criando
+        // A função createCompany espera um objeto sem 'id' e 'ativo'
+        const newCompanyData = {
+          ...companyToSave,
+          id: undefined,
+          ativo: undefined,
+        } as Omit<Company, 'id' | 'ativo'>;
+        const newCompany = await createCompany(newCompanyData);
+        setCompanies([...companies, newCompany]);
+        addNotification('Empresa criada com sucesso!', 'success');
+      }
+      handleCloseModal();
+    } catch (err: any) {
+      addNotification(`Erro ao salvar empresa: ${err.message}`, 'error');
     }
-    handleCloseModal();
   };
-  const handleDeactivateCompany = (companyId: number) => {
-    if (window.confirm('Tem certeza que deseja desativar esta empresa? Esta ação não poderá ser desfeita.')) {
-      // ! Substituir com chamada real à API para desativar a empresa (PATCH/PUT)
-      setCompanies(companies.map(company => 
-        company.id === companyId ? { ...company, status: 'Desativada' } : company
-      ));
-      console.log('Desativando empresa com ID:', companyId);
+
+  const handleToggleActive = async (companyId: number) => {
+    const company = companies.find(c => c.id === companyId);
+    if (!company) return;
+
+    const action = company.ativo ? 'desativar' : 'ativar';
+    if (window.confirm(`Tem certeza que deseja ${action} esta empresa?`)) {
+      try {
+        const updatedCompany = await toggleCompanyActiveStatus(companyId);
+        setCompanies(companies.map(c => 
+          c.id === companyId ? updatedCompany : c
+        ));
+        addNotification(`Empresa ${action === 'ativar' ? 'ativada' : 'desativada'} com sucesso!`, 'success');
+      } catch (err: any) {
+        addNotification(`Erro ao ${action} empresa: ${err.message}`, 'error');
+      }
     }
   };
 
@@ -128,7 +117,7 @@ export function MyCompaniesPage() {
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
             {isLoading && <p className="text-center text-gray-600">Carregando empresas...</p>}
             {error && <p className="text-center text-red-500">{error}</p>}
-            {!isLoading && !error && (
+            {!isLoading && !error && companies && (
               companies.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -144,22 +133,22 @@ export function MyCompaniesPage() {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {companies.map((company) => ( 
                         <tr key={company.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{company.razao_social}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{company.nome_fantasia || '--'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{company.razaoSocial}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{company.nomeFantasia || '--'}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{company.cnpj}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              company.status === 'Ativa' ? 'bg-green-100 text-green-800' :
+                              company.ativo ? 'bg-green-100 text-green-800' :
                               'bg-gray-100 text-gray-800'
                             }`}>
-                              {company.status}
+                              {company.ativo ? 'Ativa' : 'Inativa'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button onClick={() => handleOpenModal(company)} className="text-blue-600 hover:text-blue-900 mr-4">Editar</button>
-                            {company.status === 'Ativa' && (
-                              <button onClick={() => handleDeactivateCompany(company.id)} className="text-red-600 hover:text-red-900">Desativar</button>
-                            )}
+                            <button onClick={() => handleToggleActive(company.id)} className={company.ativo ? "text-red-600 hover:text-red-900" : "text-green-600 hover:text-green-900"}>
+                              {company.ativo ? 'Desativar' : 'Ativar'}
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -168,10 +157,9 @@ export function MyCompaniesPage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <p className="mt-1 text-gray-500">Nenhuma empresa encontrada.</p>
-                  <Link to="/register-company" className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Cadastrar Nova Empresa
-                  </Link>
+                  <ShieldAlert size={48} className="mx-auto text-gray-400" />
+                  <h3 className="mt-4 text-xl font-semibold text-gray-700">Nenhuma empresa encontrada</h3>
+                  <p className="mt-1 text-gray-500">Comece cadastrando uma nova empresa no botão acima.</p>
                 </div>
               )
             )}

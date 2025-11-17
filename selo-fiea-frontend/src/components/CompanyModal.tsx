@@ -1,38 +1,15 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { X } from 'lucide-react';
-
-export interface Company {
-  id: number;
-  razao_social: string;
-  nome_fantasia: string;
-  cnpj: string;
-  setor: string;
-  porte: 'Pequeno' | 'Médio' | 'Grande';
-  endereco: string;
-  email: string;
-  telefone: string;
-  status: 'Ativa' | 'Desativada';
-}
+import type { Company } from '../types/company';
 
 interface CompanyModalProps {
   company: Company | null;
   onClose: () => void;
-  onSave: (company: Company) => void;
+  onSave: (company: Partial<Company>) => void;
 }
 
 export function CompanyModal({ company, onClose, onSave }: CompanyModalProps) {
-  const [formData, setFormData] = useState<Company>({
-    id: company?.id || 0,
-    razao_social: company?.razao_social || '',
-    nome_fantasia: company?.nome_fantasia ?? '',
-    cnpj: company?.cnpj ?? '',
-    setor: company?.setor ?? '',
-    porte: company?.porte ?? 'Pequeno',
-    endereco: company?.endereco ?? '',
-    email: company?.email ?? '',
-    telefone: company?.telefone ?? '',
-    status: company?.status || 'Ativa',
-  });
+  const [formData, setFormData] = useState<Partial<Company>>({});
 
   useEffect(() => {
     // Trava o scroll da página principal quando o modal está aberto
@@ -41,6 +18,27 @@ export function CompanyModal({ company, onClose, onSave }: CompanyModalProps) {
       document.body.style.overflow = 'auto';
     };
   }, []);
+
+  useEffect(() => {
+    if (company) {
+      setFormData(company);
+    } else {
+      // Define um estado inicial limpo para um novo cadastro
+      setFormData({
+        razaoSocial: '',
+        nomeFantasia: '',
+        cnpj: '',
+        setor: '',
+        porte: 'Pequeno',
+        endereco: '',
+        email: '',
+        telefone: '',
+        ativo: true,
+      });
+    }
+  }, [company]);
+
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -83,7 +81,7 @@ export function CompanyModal({ company, onClose, onSave }: CompanyModalProps) {
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    onSave(formData);
+    onSave(formData as Company);
   };
 
   const isEditing = company !== null;
@@ -101,42 +99,42 @@ export function CompanyModal({ company, onClose, onSave }: CompanyModalProps) {
           <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="razao_social" className="block text-sm font-medium text-gray-700 mb-1">Razão Social</label>
-                <input type="text" id="razao_social" name="razao_social" value={formData.razao_social} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
+                <label htmlFor="razaoSocial" className="block text-sm font-medium text-gray-700 mb-1">Razão Social</label>
+                <input type="text" id="razaoSocial" name="razaoSocial" value={formData.razaoSocial || ''} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
               </div>
               <div>
-                <label htmlFor="nome_fantasia" className="block text-sm font-medium text-gray-700 mb-1">Nome Fantasia</label>
-                <input type="text" id="nome_fantasia" name="nome_fantasia" value={formData.nome_fantasia} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
+                <label htmlFor="nomeFantasia" className="block text-sm font-medium text-gray-700 mb-1">Nome Fantasia</label>
+                <input type="text" id="nomeFantasia" name="nomeFantasia" value={formData.nomeFantasia || ''} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="cnpj" className="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
-                <input type="text" id="cnpj" name="cnpj" value={formData.cnpj} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required maxLength={18} />
+                <input type="text" id="cnpj" name="cnpj" value={formData.cnpj || ''} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required maxLength={18} />
               </div>
               <div>
                 <label htmlFor="setor" className="block text-sm font-medium text-gray-700 mb-1">Setor</label>
-                <input type="text" id="setor" name="setor" value={formData.setor} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
+                <input type="text" id="setor" name="setor" value={formData.setor || ''} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
-                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
+                <input type="email" id="email" name="email" value={formData.email || ''} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
               </div>
               <div>
                 <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-                <input type="tel" id="telefone" name="telefone" value={formData.telefone} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required maxLength={15} />
+                <input type="tel" id="telefone" name="telefone" value={formData.telefone || ''} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required maxLength={15} />
               </div>
             </div>
             <div>
               <label htmlFor="endereco" className="block text-sm font-medium text-gray-700 mb-1">Endereço Completo</label>
-              <input type="text" id="endereco" name="endereco" value={formData.endereco} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
+              <input type="text" id="endereco" name="endereco" value={formData.endereco || ''} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="porte" className="block text-sm font-medium text-gray-700 mb-1">Porte</label>
-                <select id="porte" name="porte" value={formData.porte} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
+                <select id="porte" name="porte" value={formData.porte || 'Pequeno'} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
                   <option value="Pequeno">Pequeno</option>
                   <option value="Médio">Médio</option>
                   <option value="Grande">Grande</option>

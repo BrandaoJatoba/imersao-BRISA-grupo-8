@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { LoginHeader } from "../components/LoginHeader";
 import { Footer } from "../components/Footer";
+import { apiClient } from "../services/apiClient"; 
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,7 @@ export function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const tokenFromUrl = searchParams.get('token');
@@ -27,34 +29,39 @@ export function ResetPasswordPage() {
     event.preventDefault();
     setError('');
     setMessage('');
+    setIsLoading(true);
 
     if (password !== confirmPassword) {
       setError('As senhas não coincidem.');
+      setIsLoading(false);
       return;
     }
     if (!token) {
-        setError('Token inválido.');
-        return;
+      setError('Token inválido.');
+      setIsLoading(false);
+      return;
     }
 
-    // ! Chamar a API do back-end aqui
-    // Exemplo:
-    // try {
-    //   const response = await fetch('/api/password/reset', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ token, newPassword: password }),
-    //   });
-    //   // if (response.ok) ...
-    // } catch (error) { ... }
-
-    // Simulação de sucesso para o front-end:
-    console.log("Redefinindo senha com o token:", token);
-    setMessage('Senha redefinida com sucesso! Você será redirecionado para o login.');
-    
-    setTimeout(() => {
-        navigate('/login');
-    }, 3000); // Redireciona após 3 segundos
+    try {
+      // API REAL
+      await apiClient.publicPost('/auth/reset-password', {
+        token,
+        password: password, // A API espera 'password', não 'newPassword'
+      });
+      
+      console.log("Redefinindo senha com o token:", token);
+      setMessage('Senha redefinida com sucesso! Você será redirecionado para o login.');
+      
+      setTimeout(() => {
+          navigate('/login');
+      }, 3000); // Redireciona após 3 segundos
+      
+    } catch (err: any) {
+      console.error("Erro ao redefinir senha:", err);
+      setError(err.message || 'Falha ao redefinir a senha. O token pode ser inválido ou ter expirado.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -81,6 +88,7 @@ export function ResetPasswordPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="mb-6">
@@ -92,11 +100,12 @@ export function ResetPasswordPage() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 <div>
-                  <button type="submit" className="w-full bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-800 transition-all shadow-sm">
-                    Salvar Nova Senha
+                  <button type="submit" className="w-full bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-800 transition-all shadow-sm" disabled={isLoading}>
+                    {isLoading ? 'Salvando...' : 'Salvar Nova Senha'}
                   </button>
                 </div>
               </form>
