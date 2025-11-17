@@ -155,7 +155,21 @@ export function AuditsPage() {
         { parecerFinal: updatedAudit.parecerFinal }
       );
       
-      addNotification('Parecer salvo com sucesso!', 'success');
+      // Se a auditoria foi marcada como 'conforme', emite o selo
+      if (updatedAudit.status === 'conforme') {
+        try {
+          await apiClient.post('/selos-emitidos/emitir', {
+            auditoriaId: updatedAudit.id,
+          });
+          addNotification('Auditoria concluída e selo emitido com sucesso!', 'success');
+        } catch (emissionError: any) {
+          // Notifica sobre o parecer salvo, mas avisa sobre o erro na emissão
+          addNotification(`Parecer salvo, mas falha ao emitir selo: ${emissionError.message}`, 'error');
+        }
+      } else {
+        addNotification('Parecer salvo com sucesso!', 'success');
+      }
+
       handleCloseParecerModal();
       fetchAudits(); 
       

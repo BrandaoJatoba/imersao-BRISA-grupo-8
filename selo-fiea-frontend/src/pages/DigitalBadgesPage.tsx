@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Award, Building, Calendar, ShieldCheck, ShieldAlert, Download, Copy, QrCode } from 'lucide-react';
+import { Award, Building, Calendar, ShieldCheck, ShieldAlert, Download, Copy, FileText } from 'lucide-react';
 import type { Badge } from "./BadgesPage"; // Assumindo que Badge vem de BadgesPage
 import type { Company } from "../types/company";
 import { apiClient, BASE_URL } from "../services/apiClient"; 
@@ -152,7 +152,7 @@ export function DigitalBadgesPage() {
                             className="text-xs rounded border px-3 py-1 hover:bg-gray-100 flex items-center gap-1"
                             onClick={() => handleViewCertificate(issued.id)}
                           >
-                            <QrCode size={12} /> Baixar Certificado
+                            <FileText size={12} /> Ver Certificado
                           </button>
                         </div>
 
