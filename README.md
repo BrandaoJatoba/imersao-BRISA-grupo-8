@@ -52,19 +52,19 @@
 - `DELETE /certification-cycles/:id` - Deletar
 
 ## Autoavaliações
-- `POST /self-assessments` - Criar
-- `GET /self-assessments` - Listar (query: ?cycleId=X ou ?userId=X)
-- `GET /self-assessments/:id` - Buscar por ID
-- `PATCH /self-assessments/:id` - Atualizar
-- `POST /self-assessments/:id/submit` - Submeter (envia email)
-- `DELETE /self-assessments/:id` - Deletar
+- `POST /self-assessments` - Criar ✅ (SelfAssessmentPage.tsx)
+- `GET /self-assessments` - Listar (query: ?cycleId=X ou ?userId=X) ✅ (SelfAssessmentPage.tsx)
+- `GET /self-assessments/:id` - Buscar por ID 🚧 Não utilizado no código.
+- `PATCH /self-assessments/:id` - Atualizar ✅ (SelfAssessmentPage.tsx)
+- `POST /self-assessments/:id/submit` - Submeter (envia email) ✅ (SelfAssessmentPage.tsx)
+- `DELETE /self-assessments/:id` - Deletar 🚧 Não utilizado no código.
 
 ## Evidências
-- `POST /evidences/upload` - Upload (query: ?questionId=X ou ?selfAssessmentId=X)
-- `GET /evidences` - Listar (query: ?questionId=X ou ?selfAssessmentId=X)
-- `GET /evidences/:id` - Buscar por ID
-- `GET /evidences/:id/download` - Download
-- `DELETE /evidences/:id` - Deletar
+- `POST /evidences/upload` - Upload (query: ?questionId=X ou ?selfAssessmentId=X) ✅ (SelfAssessmentPage.tsx)
+- `GET /evidences` - Listar (query: ?questionId=X ou ?selfAssessmentId=X) 🚧 Não utilizado no código.
+- `GET /evidences/:id` - Buscar por ID 🚧 Não utilizado no código.
+- `GET /evidences/:id/download` - Download ✅ (ParecerModal.tsx)
+- `DELETE /evidences/:id` - Deletar ✅ (SelfAssessmentPage.tsx)
 
 ## Auditorias (Sistema de Pontuação)
 - `POST /auditorias` - Criar ✅ (AuditsPage.tsx)
@@ -87,13 +87,13 @@
 > O frontend foi projetado com uma filosofia de "formulário único" para as operações de criação e avaliação, onde o usuário espera que uma única ação (que nesse caso é a de salvar) resolva tudo. No entanto, a API subjacente é "granular", exigindo múltiplas chamadas sequenciais para concluir o processo de criação de uma auditoria com seus tópicos e a avaliação de todos os tópicos com o parecer geral. Isso forçou o código do frontend a ser refatorado para executar essas chamadas encadeadas, o que aumentou drasticamente sua complexidade. Adicionalmente, a ausência de um endpoint específico na API para upload de evidências diretamente para a entidade principal auditId impossibilitou a funcionalidade de upload de documentos de apoio no formulário de criação. Por fim, a existência de endpoints redundantes (a seção `/audit-findings` completa não foi utilizada, pois as operações de avaliação foram realizadas através de endpoints aninhados em `/auditorias`) complicou a escolha da implementação, embora o frontend tenha optado por uma seção, tornando a outra redundante.
 
 ## Selos Emitidos
-- `POST /selos-emitidos/emitir` - Emitir (via Auditoria) ✅ (AuditsPage.tsx)
+- `POST /selos-emitidos/emitir` - Emitir (via Auditoria) ✅(AuditsPage.tsx)
 - `GET /selos-emitidos/validar/:id` - **PÚBLICO** - Validar selo ✅ (BadgeVerificationPage.tsx)
-- `GET /selos-emitidos` - Listar 🚧 Não utilizado no código
+- `GET /selos-emitidos` - Listar 🚧Não utilizado no código.
 - `GET /selos-emitidos/empresa/:empresaId` - Listar por empresa ✅ (DigitalBadgesPage.tsx)
-- `GET /selos-emitidos/:id` - Buscar por ID 🚧 Não utilizado no código
-- `PATCH /selos-emitidos/:id/revogar` - Revogar 🚧 Não utilizado no código
-- `POST /selos-emitidos/verificar-expirados` - Verificar expirados 🚧 Não utilizado no código
+- `GET /selos-emitidos/:id` - Buscar por ID 🚧Não utilizado no código.
+- `PATCH /selos-emitidos/:id/revogar` - Revogar 🚧Não utilizado no código.
+- `POST /selos-emitidos/verificar-expirados` - Verificar expirados 🚧Não utilizado no código.
 - `GET /selos-emitidos/:id/certificado` - Visualizar certificado ✅ (DigitalBadgesPage.tsx)
 
 ---
