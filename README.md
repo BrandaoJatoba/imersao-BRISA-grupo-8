@@ -87,14 +87,14 @@
 > O frontend foi projetado com uma filosofia de "formulário único" para as operações de criação e avaliação, onde o usuário espera que uma única ação (que nesse caso é a de salvar) resolva tudo. No entanto, a API subjacente é "granular", exigindo múltiplas chamadas sequenciais para concluir o processo de criação de uma auditoria com seus tópicos e a avaliação de todos os tópicos com o parecer geral. Isso forçou o código do frontend a ser refatorado para executar essas chamadas encadeadas, o que aumentou drasticamente sua complexidade. Adicionalmente, a ausência de um endpoint específico na API para upload de evidências diretamente para a entidade principal auditId impossibilitou a funcionalidade de upload de documentos de apoio no formulário de criação. Por fim, a existência de endpoints redundantes (a seção `/audit-findings` completa não foi utilizada, pois as operações de avaliação foram realizadas através de endpoints aninhados em `/auditorias`) complicou a escolha da implementação, embora o frontend tenha optado por uma seção, tornando a outra redundante.
 
 ## Selos Emitidos
-- `POST /selos-emitidos/emitir` - Emitir (via Auditoria)
+- `POST /selos-emitidos/emitir` - Emitir (via Auditoria) ✅ (AuditsPage.tsx)
 - `GET /selos-emitidos/validar/:id` - **PÚBLICO** - Validar selo ✅ (BadgeVerificationPage.tsx)
-- `GET /selos-emitidos` - Listar
+- `GET /selos-emitidos` - Listar 🚧 Não utilizado no código
 - `GET /selos-emitidos/empresa/:empresaId` - Listar por empresa ✅ (DigitalBadgesPage.tsx)
-- `GET /selos-emitidos/:id` - Buscar por ID
-- `PATCH /selos-emitidos/:id/revogar` - Revogar
-- `POST /selos-emitidos/verificar-expirados` - Verificar expirados
-- `GET /selos-emitidos/:id/certificado` - Visualizar certificado
+- `GET /selos-emitidos/:id` - Buscar por ID 🚧 Não utilizado no código
+- `PATCH /selos-emitidos/:id/revogar` - Revogar 🚧 Não utilizado no código
+- `POST /selos-emitidos/verificar-expirados` - Verificar expirados 🚧 Não utilizado no código
+- `GET /selos-emitidos/:id/certificado` - Visualizar certificado ✅ (DigitalBadgesPage.tsx)
 
 ---
 
