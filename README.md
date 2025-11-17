@@ -38,11 +38,11 @@
 - `DELETE /criteria/:id` - Deletar ✅ (CriteriaPage.tsx)
 
 ## Perguntas
-- `POST /questions` - Criar
-- `GET /questions` - Listar (query: ?criterionId=X)
-- `GET /questions/:id` - Buscar por ID
-- `PATCH /questions/:id` - Atualizar
-- `DELETE /questions/:id` - Deletar
+- `POST /questions` - Criar 🚧 Não utilizado no código atualmente
+- `GET /questions` - Listar (query: ?criterionId=X) 🚧 Não utilizado no código atualmente
+- `GET /questions/:id` - Buscar por ID 🚧 Não utilizado no código atualmente
+- `PATCH /questions/:id` - Atualizar 🚧 Não utilizado no código atualmente
+- `DELETE /questions/:id` - Deletar 🚧 Não utilizado no código atualmente
 
 ## Ciclos de Certificação
 - `POST /certification-cycles` - Criar
