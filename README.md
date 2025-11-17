@@ -15,13 +15,13 @@
 - `DELETE /users/:id` - Deletar
 
 ## Empresas
-- `POST /empresas` - Criar
-- `GET /empresas` - Listar
-- `GET /empresas/:id` - Buscar por ID
-- `GET /empresas/cnpj/:cnpj` - Buscar por CNPJ
-- `PATCH /empresas/:id` - Atualizar
-- `PATCH /empresas/:id/toggle-active` - Ativar/Desativar
-- `DELETE /empresas/:id` - Deletar
+- `POST /empresas` - Criar ✅ (MyCompaniesPage.tsx)
+- `GET /empresas` - Listar ✅ (MyCompaniesPage.tsx)
+- `GET /empresas/:id` - Buscar por ID ✅ (MyCompaniesPage.tsx)
+- `GET /empresas/cnpj/:cnpj` - Buscar por CNPJ ✅ (MyCompaniesPage.tsx)
+- `PATCH /empresas/:id` - Atualizar ✅ (MyCompaniesPage.tsx)
+- `PATCH /empresas/:id/toggle-active` - Ativar/Desativar ✅ (MyCompaniesPage.tsx)
+- `DELETE /empresas/:id` - Deletar ✅ (MyCompaniesPage.tsx)
 
 ## Selos (Tipos)
 - `POST /selos` - Criar tipo de selo ✅ (BadgesPage.tsx)
