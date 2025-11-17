@@ -9,7 +9,7 @@
 - `POST /auth/reset-password` - Redefinir senha ✅ (ResetPasswordPage.tsx)
 
 ## Usuários
-- `GET /users` - Listar usuários
+- `GET /users` - Listar usuários ✅ (AuditsPage.tsx)
 - `GET /users/:id` - Buscar por ID
 - `PATCH /users/:id` - Atualizar
 - `DELETE /users/:id` - Deletar
