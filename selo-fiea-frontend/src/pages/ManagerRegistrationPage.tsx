@@ -10,10 +10,9 @@ import { apiClient } from "../services/apiClient";
 export function ManagerRegistrationPage() {
   const navigate = useNavigate();
 
-  // Campos do gestor (usuário) 
+  // Campos do gestor (usuário)
   const [responsavel, setResponsavel] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -68,11 +67,10 @@ export function ManagerRegistrationPage() {
       const payload = {
         name: responsavel,
         email, 
-        phone, 
         password,
         role: 'industry' 
       };
-
+      
       console.log("Tentativa de cadastro de usuário:", payload);
 
       await apiClient.publicPost('/auth/register', payload);
@@ -126,11 +124,8 @@ export function ManagerRegistrationPage() {
                 <legend className="text-lg font-semibold px-2">Seus Dados</legend>
                 <div className="space-y-4 p-2">
                   <input type="text" value={responsavel} onChange={(e) => setResponsavel(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Nome Completo" required disabled={isLoading} />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="E-mail (Login)" required disabled={isLoading} />
-                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Telefone / Celular" required disabled={isLoading} />
-                  </div>
-
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="E-mail (Login)" required disabled={isLoading} />
+                  
                   {/* Política de Senha */}
                   <div className="text-sm">
                     <ul className="space-y-1">

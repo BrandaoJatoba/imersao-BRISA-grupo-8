@@ -5,9 +5,7 @@ import { Link } from "react-router-dom";
 import { PlusCircle, ShieldAlert } from 'lucide-react';
 import { BadgesTable } from "../components/BadgesTable"; 
 import { DynamicForm } from "../components/DynamicForm";
-// import badgeIcon from '/badge.jpg'; 
 import { apiClient } from "../services/apiClient"; 
-import type { Criterion } from "./CriteriaPage"; 
 import { useNotifications } from "../hooks/useNotifications";
 
 // Tipos para os dados (TypeScript)
@@ -16,33 +14,24 @@ export interface Badge {
   name: string;
   description: string;
   validadeMeses: number;
-  dataInicioEmissao: Date | string; // API pode mandar string
-  dataFimEmissao: Date | string; // API pode mandar string
-  icon: string; // Pode ser uma URL ou Base64
-  criteria: string[]; // Critérios (descrições) para obter o selo
+  dataInicioEmissao: Date | string;
+  dataFimEmissao: Date | string;
+  icon: string;
+  // criteria: string[];
 }
-
-// (MOCKED_BADGES REMOVIDO)
 
 export function BadgesPage() {
   const [badges, setBadges] = useState<Badge[]>([]);
-  const [allCriteria, setAllCriteria] = useState<Criterion[]>([]); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { addNotification } = useNotifications();
 
-  // Função para buscar todos os dados
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // Carrega Selos e Critérios em paralelo
-      const [badgesData, criteriaData] = await Promise.all([
-        apiClient.get('/selos'),
-        apiClient.get('/criteria')
-      ]);
+      const badgesData = await apiClient.get('/selos');
       setBadges(badgesData);
-      setAllCriteria(criteriaData);
     } catch (error: any) {
       addNotification(`Erro ao carregar dados: ${error.message}`, 'error');
     } finally {
@@ -50,13 +39,12 @@ export function BadgesPage() {
     }
   };
 
-  // Simula a busca de dados da API quando a página carrega
   useEffect(() => {
     fetchData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOpenModal = (badge: Badge | null) => {
-    setEditingBadge(badge); // Se for null, é para criar. Se tiver dados, é para editar.
+    setEditingBadge(badge); 
     setIsModalOpen(true);
   };
 
@@ -66,7 +54,6 @@ export function BadgesPage() {
   };
 
   const handleSaveBadge = async (badgeToSave: Badge) => {
-    // O DynamicForm já converte o ícone para Base64 e formata as datas
     try {
       if (editingBadge) { 
         const updatedBadge = await apiClient.patch(`/selos/${badgeToSave.id}`, badgeToSave);
@@ -85,7 +72,7 @@ export function BadgesPage() {
   };
 
   const handleDeleteBadge = async (badgeId: number) => {
-    if (window.confirm("Tem certeza que deseja deletar este selo?")) {
+    if (window.confirm("Tem certeza que deseja deletar este selo? Os critérios associados podem ficar órfãos.")) {
       try {
         await apiClient.delete(`/selos/${badgeId}`);
         setBadges(badges.filter(b => b.id !== badgeId));
@@ -102,7 +89,7 @@ export function BadgesPage() {
           <div className="container mx-auto px-6 py-4">
               <Link to="/dashboard" className="text-sm font-semibold text-blue-600 hover:underline">← Voltar para o Dashboard</Link>
               <h1 className="text-3xl font-bold text-gray-800 mt-2">Gerenciar Selos</h1>
-              <p className="text-gray-600 mt-1">Crie e edite os tipos de selos que podem ser concedidos.</p>
+              <p className="text-gray-600 mt-1">Crie e edite os tipos de selos. (Critérios devem ser gerenciados na página de Critérios).</p>
           </div>
        </header>
 
@@ -130,7 +117,7 @@ export function BadgesPage() {
                 <div className="text-center py-12">
                     <ShieldAlert size={48} className="mx-auto text-gray-400" />
                     <h3 className="mt-4 text-xl font-semibold text-gray-700">Nenhum selo encontrado</h3>
-                    <p className="mt-1 text-gray-500">Comece criando um novo selo.</p>
+                    <p className="mt-1 text-gray-500">Comece criando um novo selo para depois adicionar critérios.</p>
                 </div>
             )}
           </div>
@@ -139,7 +126,6 @@ export function BadgesPage() {
        {isModalOpen && (
           <DynamicForm
             badge={editingBadge}
-            allCriteria={allCriteria} // Passa os critérios carregados da API
             onClose={handleCloseModal}
             onSave={handleSaveBadge}
           />
