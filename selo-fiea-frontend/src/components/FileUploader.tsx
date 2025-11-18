@@ -1,12 +1,14 @@
 // src/components/FileUploader.tsx
 import { UploadCloud, X, FileText } from 'lucide-react';
 import React from 'react';
-import type { Evidence } from '../types/Evidence';
 
-interface FileUploaderProps {
-  evidences: Evidence[];
+interface FileUploaderProps<T> {
+  files: T[];
   onFilesChange: (newFiles: File[]) => void;
-  onFileDelete: (evidenceId: string) => void;
+  onFileDelete: (fileId: string | number) => void;
+  // Funções para extrair dados do objeto de arquivo genérico
+  getFileId: (file: T) => string | number;
+  getFileName: (file: T) => string;
   acceptedTypes?: string; // Ex: ".pdf,.docx,.png"
   maxFileSizeMB?: number; // Tamanho máximo em Megabytes
   label?: string;
@@ -16,15 +18,17 @@ interface FileUploaderProps {
 const MAX_SIZE_MB = 10; // Padrão de 10MB se não for fornecido
 const ALLOWED_TYPES = ".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.webp"; // Padrão
 
-export function FileUploader({
-  evidences,
+export function FileUploader<T>({
+  files: displayedFiles,
   onFilesChange,
   onFileDelete,
+  getFileId,
+  getFileName,
   acceptedTypes = ALLOWED_TYPES,
   maxFileSizeMB = MAX_SIZE_MB,
   label = "Clique para enviar arquivos",
   description = "PDF, DOCX, XLSX, PNG, ou JPG (Máx. 10MB por arquivo)"
-}: FileUploaderProps) {
+}: FileUploaderProps<T>) {
 
   const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024;
 
@@ -50,7 +54,7 @@ export function FileUploader({
       }
       
       // Validação de duplicidade (nome do arquivo já na lista de evidências)
-      if (evidences.some(e => e.fileName === file.name)) {
+      if (displayedFiles.some(existingFile => getFileName(existingFile) === file.name)) {
          errors.push(`O arquivo "${file.name}" já foi adicionado.`);
          return;
       }
@@ -85,23 +89,23 @@ export function FileUploader({
       />
 
       {/* Lista de Arquivos Selecionados */}
-      {evidences.length > 0 && (
+      {displayedFiles.length > 0 && (
         <div className="mt-4 space-y-2">
            <h4 className="text-sm font-medium text-gray-700">Evidências Anexadas:</h4>
           <ul className="space-y-2 max-h-40 overflow-y-auto pr-2">
-            {evidences.map((evidence) => (
+            {displayedFiles.map((file) => (
               <li 
-                key={evidence.id} 
+                key={getFileId(file)} 
                 className="flex items-center justify-between p-2 bg-gray-100 rounded-md border border-gray-200"
               >
                 <div className="flex items-center space-x-2 overflow-hidden">
                    <FileText size={18} className="text-gray-500 flex-shrink-0" />
-                   <span className="text-sm text-gray-800 truncate" title={evidence.fileName}>{evidence.fileName}</span>
+                   <span className="text-sm text-gray-800 truncate" title={getFileName(file)}>{getFileName(file)}</span>
                    {/* O tamanho do arquivo não está disponível no objeto Evidence, então removemos a exibição */}
                 </div>
                 <button
                   type="button"
-                  onClick={() => onFileDelete(evidence.id)}
+                  onClick={() => onFileDelete(getFileId(file))}
                   className="text-red-500 hover:text-red-700 ml-2 flex-shrink-0"
                 >
                   <X size={16} />

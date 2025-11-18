@@ -154,9 +154,13 @@ export function SelfAssessmentPage() {
     }
   };
 
-  const handleFileDelete = async (evidenceId: string) => {
+  const handleFileDelete = (fileId: string | number) => {
     if (!assessment || !window.confirm("Tem certeza que deseja remover esta evidência?")) return;
 
+    // Como nesta página o ID é sempre uma string, garantimos o tipo.
+    const evidenceId = String(fileId);
+
+    const deleteEvidence = async () => {
     try {
       await apiClient.delete(`/evidences/${evidenceId}`);
       // Atualiza o estado para remover a evidência da UI
@@ -171,7 +175,10 @@ export function SelfAssessmentPage() {
     } catch (error: any) {
       addNotification(`Falha ao remover evidência: ${error.message}`, 'error');
     }
-    setSaveStatus('idle');
+      setSaveStatus('idle');
+    };
+
+    void deleteEvidence();
   };
 
 
@@ -337,9 +344,11 @@ export function SelfAssessmentPage() {
                 Anexar Evidências (Opcional)
               </label>
               <FileUploader
-                  evidences={currentCriterionAnswer.evidences}
+                  files={currentCriterionAnswer.evidences}
                   onFilesChange={handleFilesChange}
                   onFileDelete={handleFileDelete}
+                  getFileId={(evidence) => evidence.id}
+                  getFileName={(evidence) => evidence.fileName}
                   description="PDF, DOCX, PNG, ou JPG (Máx. 10MB)"
                 />
             </div>
