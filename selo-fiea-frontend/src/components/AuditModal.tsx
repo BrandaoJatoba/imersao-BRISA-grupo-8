@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import type { Audit, AuditTopic, User } from '../pages/AuditsPage';
 import { X, Plus, Trash2 } from 'lucide-react';
-//import { FileUploader } from './FileUploader';
+import { FileUploader } from './FileUploader'; 
+import type { Evidence } from '../types/Evidence';
 
 export interface AuditFormData {
   id: number;
   title: string;
   description: string;
   mainAuditorId: number | null;
-  documents: File[];
+  documents: (File | Evidence)[]; // Aceita arquivos novos e evidências existentes
   topics: AuditTopic[];
   status: 'em_analise' | 'conforme' | 'nao_conforme';
 }
@@ -61,9 +62,18 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
     }));
   };
 
-/*   const handleFilesChange = (newFiles: File[]) => {
-    setFormData(prev => ({ ...prev, documents: newFiles }));
-  }; TEMP */
+  // Função para o novo componente FileUploader
+  const handleFilesChange = (newFiles: File[]) => {
+    // Adiciona novos arquivos à lista existente, evitando duplicatas
+    setFormData(prev => ({ ...prev, documents: [...prev.documents, ...newFiles] }));
+  };
+
+  const handleFileDelete = (fileName: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: prev.documents.filter(doc => (doc instanceof File ? doc.name : doc.fileName) !== fileName)
+    }));
+  }
 
   const handleAddTopic = () => {
     if (!newTopicTitle.trim()) return;
@@ -75,10 +85,10 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
       description: newTopicDesc,
       scoreLevel: 0,
       auditorId: null,
-      parecer: '',
-      companySelfScore: 0, // Valor padrão
-      companyParecer: '',  // Valor padrão
-      evidences: []        // Valor padrão
+      parecer: '', // <<<--- CORREÇÃO ADICIONADA AQUI
+      companySelfScore: 0,
+      companyParecer: '',
+      evidences: [],
     };
 
     setFormData(prev => ({ ...prev, topics: [...prev.topics, newTopic] }));
@@ -162,8 +172,11 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
               <legend className="text-lg font-semibold px-2">Documentos de Apoio / Evidências</legend>
               <div className="p-2">
                 <FileUploader
-                  selectedFiles={formData.documents} // Certifique-se que FileUploader aceita esta prop
+                  files={formData.documents}
                   onFilesChange={handleFilesChange}
+                  onFileDelete={handleFileDelete}
+                  getFileId={(file) => (file instanceof File ? file.name : file.id)}
+                  getFileName={(file) => (file instanceof File ? file.name : file.fileName)}
                   acceptedTypes=".pdf,.docx,.xlsx,.png,.jpg,.jpeg"
                   description="PDF, DOCX, XLSX, PNG, ou JPG (Máx. 10MB)"
                 />

@@ -16,6 +16,7 @@ import { MyCompaniesPage } from './pages/MyCompaniesPage';
 import { DigitalBadgesPage } from './pages/DigitalBadgesPage';
 import { BadgeVerificationPage } from './pages/BadgeVerificationPage';
 import { AvailableBadgesPage } from './pages/AvailableBadgesPage';
+import { CompanyRegistrationPage } from './pages/CompanyRegistrationPage'; 
 
 import { PublicLayout } from './layouts/PublicLayout';
 import { AdminLayout } from './layouts/AdminLayout';
