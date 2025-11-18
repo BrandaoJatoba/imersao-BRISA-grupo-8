@@ -1,17 +1,14 @@
-// src/components/AuditModal.tsx
-
 import { useState, useEffect } from 'react';
 import type { Audit, AuditTopic, User } from '../pages/AuditsPage';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { FileUploader } from './FileUploader'; 
+//import { FileUploader } from './FileUploader';
 
-// Interface para os dados do formulário
 export interface AuditFormData {
   id: number;
   title: string;
   description: string;
   mainAuditorId: number | null;
-  documents: File[]; 
+  documents: File[];
   topics: AuditTopic[];
   status: 'em_analise' | 'conforme' | 'nao_conforme';
 }
@@ -64,21 +61,26 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
     }));
   };
 
-  // Função para o novo componente FileUploader
-  const handleFilesChange = (newFiles: File[]) => {
+/*   const handleFilesChange = (newFiles: File[]) => {
     setFormData(prev => ({ ...prev, documents: newFiles }));
-  };
+  }; TEMP */
 
   const handleAddTopic = () => {
     if (!newTopicTitle.trim()) return;
+    
+    // CORREÇÃO: Adicionadas as propriedades obrigatórias que faltavam (Erro TS2739)
     const newTopic: AuditTopic = {
-      id: `temp_${Date.now()}`, 
+      id: `temp_${Date.now()}`,
       title: newTopicTitle,
       description: newTopicDesc,
-      scoreLevel: 0, 
+      scoreLevel: 0,
       auditorId: null,
-      parecer: '', // <<<--- CORREÇÃO ADICIONADA AQUI
+      parecer: '',
+      companySelfScore: 0, // Valor padrão
+      companyParecer: '',  // Valor padrão
+      evidences: []        // Valor padrão
     };
+
     setFormData(prev => ({ ...prev, topics: [...prev.topics, newTopic] }));
     setNewTopicTitle("");
     setNewTopicDesc("");
@@ -93,7 +95,7 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
 
   const handleTopicChange = (
     topicId: string,
-    field: 'auditorId' | 'scoreLevel', // O campo 'parecer' não é editável aqui
+    field: 'auditorId' | 'scoreLevel',
     value: string | number
   ) => {
     setFormData(prev => ({
@@ -123,7 +125,6 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
 
         <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto">
           <div className="p-6 space-y-6">
-            {/* HU 07 - Campos Principais */}
             <fieldset className="border p-4 rounded-lg">
               <legend className="text-lg font-semibold px-2">Dados Gerais</legend>
               <div className="space-y-4 p-2">
@@ -136,7 +137,6 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
                   <textarea name="description" id="description" value={formData.description} onChange={handleChange} rows={3} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* HU 08 - Atribuir responsável total */}
                   <div>
                     <label htmlFor="mainAuditorId" className="block text-sm font-medium text-gray-700 mb-1">Auditor Principal</label>
                     <select name="mainAuditorId" id="mainAuditorId" value={formData.mainAuditorId ?? ''} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg">
@@ -146,7 +146,6 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
                       ))}
                     </select>
                   </div>
-                  {/* HU 10 - Status */}
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                     <select name="status" id="status" value={formData.status} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg">
@@ -159,24 +158,21 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
               </div>
             </fieldset>
             
-            {/* HU 07/09 - Upload de Documentos */}
-            <fieldset className="border p-4 rounded-lg">
+            {/* <fieldset className="border p-4 rounded-lg">
               <legend className="text-lg font-semibold px-2">Documentos de Apoio / Evidências</legend>
               <div className="p-2">
                 <FileUploader
-                  selectedFiles={formData.documents}
+                  selectedFiles={formData.documents} // Certifique-se que FileUploader aceita esta prop
                   onFilesChange={handleFilesChange}
                   acceptedTypes=".pdf,.docx,.xlsx,.png,.jpg,.jpeg"
                   description="PDF, DOCX, XLSX, PNG, ou JPG (Máx. 10MB)"
                 />
               </div>
-            </fieldset>
+            </fieldset> TEMP*/}
 
-            {/* HU 07/08/10 - Tópicos de Avaliação */}
             <fieldset className="border p-4 rounded-lg">
               <legend className="text-lg font-semibold px-2">Tópicos de Avaliação</legend>
               <div className="space-y-4 p-2">
-                {/* Formulário de Adicionar Tópico */}
                 <div className="flex items-start gap-4">
                   <div className="flex-grow space-y-2">
                     <input
@@ -199,7 +195,6 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
                   </button>
                 </div>
 
-                {/* Lista de Tópicos Adicionados */}
                 <div className="space-y-4 max-h-60 overflow-y-auto pr-2">
                   {formData.topics.map(topic => (
                     <div key={topic.id} className="border bg-gray-50 p-4 rounded-lg space-y-3">
@@ -213,7 +208,6 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
                         </button>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* HU 08 - Responsável por Tópico */}
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-1">Responsável pelo Tópico</label>
                           <select
@@ -227,7 +221,6 @@ export function AuditModal({ audit, allAuditors, onClose, onSave }: AuditModalPr
                             ))}
                           </select>
                         </div>
-                        {/* HU 10 - Pontuação por Nível */}
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-1">Pontuação (Nível)</label>
                           <select

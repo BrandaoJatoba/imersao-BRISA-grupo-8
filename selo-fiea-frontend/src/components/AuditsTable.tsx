@@ -1,4 +1,4 @@
-import { Edit, Trash2, FileCheck, Clock, ClipboardList } from 'lucide-react'; // NOVO ÍCONE
+import { Edit, Trash2, ClipboardList } from 'lucide-react'; // NOVO ÍCONE
 import type { Audit } from '../pages/AuditsPage';
 import type { User } from '../pages/AuditsPage';
 

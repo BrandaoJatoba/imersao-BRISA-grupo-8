@@ -43,11 +43,13 @@ function App() {
       </Route>
 
       {/* NOVAS Rotas Protegidas (Indústria) */}
-      <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
-      <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
-      <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
-      <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
-      <Route path="/industry/dashboard/selos-disponiveis" element={<AvailableBadgesPage />} />
+      <Route element={<IndustryLayout />}>
+        <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
+        <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
+        <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
+        <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
+        <Route path="/industry/dashboard/selos-disponiveis" element={<AvailableBadgesPage />} />
+      </Route>
     </Routes>
   )
 }

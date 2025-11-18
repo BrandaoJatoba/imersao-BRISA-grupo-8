@@ -24,13 +24,18 @@ export function AuthForm() {
         password: loginPassword,
       });
 
-      // Assumindo que a API retorna um 'token' e um 'user'
-      localStorage.setItem('authToken', data.token);
-      
-      // Opcional: Salvar dados do usuário para fácil acesso
-      localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.accessToken) {
+                localStorage.setItem('authToken', data.accessToken);
+            } else {
+                // Fallback de segurança caso a API mude ou falhe
+                console.error("Token não recebido da API", data);
+                throw new Error("Falha na autenticação: Token não recebido.");
+            }
+            
+            // Opcional: Salvar dados do usuário para fácil acesso
+            localStorage.setItem('user', JSON.stringify(data.user));
 
-      console.log('Login bem-sucedido!', data.user);
+            console.log('Login bem-sucedido!', data.user);
 
       // Redireciona com base na role (ajuste 'data.user.role' conforme sua API)
       if (data.user.role === 'admin' || data.user.role === 'gestor') {
