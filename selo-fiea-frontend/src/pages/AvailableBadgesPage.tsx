@@ -15,8 +15,7 @@ const MOCKED_BADGES: Badge[] = [
     validadeMeses: 12,
     dataInicioEmissao: new Date('2023-01-01'),
     dataFimEmissao: new Date('2023-12-31'),
-    icon: badgeIcon,
-    criteria: ['Qualidade de Gestão', 'Sustentabilidade Ambiental', 'Inovação Tecnológica', 'Saúde e Segurança'] 
+    icon: badgeIcon 
   },
 ];
 
