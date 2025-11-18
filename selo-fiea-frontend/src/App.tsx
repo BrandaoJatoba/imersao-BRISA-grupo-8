@@ -16,6 +16,7 @@ import { MyCompaniesPage } from './pages/MyCompaniesPage';
 import { DigitalBadgesPage } from './pages/DigitalBadgesPage';
 import { BadgeVerificationPage } from './pages/BadgeVerificationPage';
 import { AvailableBadgesPage } from './pages/AvailableBadgesPage';
+import { CompanyRegistrationPage } from './pages/CompanyRegistrationPage'; 
 
 import { PublicLayout } from './layouts/PublicLayout';
 import { AdminLayout } from './layouts/AdminLayout';
@@ -42,14 +43,15 @@ function App() {
         <Route path="/dashboard/criterios" element={<CriteriaPage />} />
       </Route>
 
-      {/* NOVAS Rotas Protegidas (Indústria) */}
-      <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
-      <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
-      <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
-      <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
-      <Route path="/industry/dashboard/selos-disponiveis" element={<AvailableBadgesPage />} />
-    </Routes>
-  )
+      {/* Rotas Protegidas (Indústria) */}
+      <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
+      <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
+      <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
+      <Route path="/industry/dashboard/nova-empresa" element={<CompanyRegistrationPage />} />
+      <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
+      <Route path="/industry/dashboard/selos-disponiveis" element={<AvailableBadgesPage />} />
+    </Routes>
+  )
 }
 
 export default App;
