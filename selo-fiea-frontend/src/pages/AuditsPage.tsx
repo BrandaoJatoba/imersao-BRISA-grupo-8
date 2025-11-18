@@ -8,6 +8,7 @@ import { AuditModal, type AuditFormData } from "../components/AuditModal";
 import { ParecerModal } from "../components/ParecerModal";
 import { apiClient } from "../services/apiClient"; 
 import { useNotifications } from "../hooks/useNotifications"; // para feedback
+import type { Evidence } from '../types/Evidence';
 
 // --- Tipos de Dados ---
 
@@ -16,13 +17,6 @@ export interface User {
   id: number;
   name: string;
   // se for preciso for, adicionar outros campos de usuário que a API /users retorna
-}
-
-// Interface para as evidências, importada ou redefinida para consistência
-export interface Evidence {
-  id: string;
-  fileName: string;
-  url: string; // O caminho para o download
 }
 
 // Tópicos de Auditoria
