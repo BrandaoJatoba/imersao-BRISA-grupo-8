@@ -2,32 +2,31 @@
 
 import { useState, useEffect } from 'react';
 import type { Badge } from '../pages/BadgesPage';
-import type { Criterion } from '../pages/CriteriaPage';
 import { X, UploadCloud } from 'lucide-react';
 
 interface DynamicFormProps {
   badge: Badge | null;
   onClose: () => void;
   onSave: (badge: Badge) => void;
-  allCriteria: Criterion[];
+  // allCriteria: Criterion[];
 }
 
 interface BadgeForm {
   name: string;
   description: string;
   icon: string;
-  criteria: string[];
+  // criteria: string[]; 
   validadeMeses: number;
   dataInicioEmissao: string;
   dataFimEmissao: string;
 }
 
-export function DynamicForm({ badge, onClose, onSave, allCriteria }: DynamicFormProps) {
+export function DynamicForm({ badge, onClose, onSave }: DynamicFormProps) {
   const [formData, setFormData] = useState<BadgeForm>({
     name: '',
     description: '',
     icon: '',
-    criteria: [],
+    // criteria: [],
     validadeMeses: 12,
     dataInicioEmissao: '',
     dataFimEmissao: '',
@@ -41,7 +40,7 @@ export function DynamicForm({ badge, onClose, onSave, allCriteria }: DynamicForm
         name: badge.name,
         description: badge.description,
         icon: badge.icon,
-        criteria: badge.criteria,
+        // criteria: badge.criteria,
         validadeMeses: badge.validadeMeses,
         dataInicioEmissao: badge.dataInicioEmissao
           ? new Date(badge.dataInicioEmissao).toISOString().split('T')[0]
@@ -50,7 +49,7 @@ export function DynamicForm({ badge, onClose, onSave, allCriteria }: DynamicForm
           ? new Date(badge.dataFimEmissao).toISOString().split('T')[0]
           : '',
       });
-      setImagePreview(badge.icon); // Mostra o ícone existente
+      setImagePreview(badge.icon);
     }
   }, [badge]);
 
@@ -71,7 +70,7 @@ export function DynamicForm({ badge, onClose, onSave, allCriteria }: DynamicForm
     // Validação de tamanho (5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert('O arquivo é muito grande. O tamanho máximo é de 5MB.');
-      e.target.value = ''; // Limpa o input
+      e.target.value = '';
       return;
     }
 
@@ -79,7 +78,7 @@ export function DynamicForm({ badge, onClose, onSave, allCriteria }: DynamicForm
     const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       alert('Tipo de arquivo inválido. Apenas SVG, PNG, JPG e WEBP são permitidos.');
-      e.target.value = ''; // Limpa o input
+      e.target.value = '';
       return;
     }
 
@@ -93,42 +92,31 @@ export function DynamicForm({ badge, onClose, onSave, allCriteria }: DynamicForm
     reader.readAsDataURL(file);
   };
 
-  const handleAddCriteria = (criterionDescription: string) => {
-    if (criterionDescription && !formData.criteria.includes(criterionDescription)) {
-      setFormData(prev => ({
-        ...prev,
-        criteria: [...prev.criteria, criterionDescription],
-      }));
-    }
-  };
-
-  const handleRemoveCriteria = (indexToRemove: number) => {
-    setFormData(prev => ({
-      ...prev,
-      criteria: prev.criteria.filter((_, index) => index !== indexToRemove),
-    }));
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const { 
+        name, description, icon, validadeMeses, 
+        dataInicioEmissao, dataFimEmissao 
+        // criteria,
+    } = formData;
+
     const badgeToSave: Badge = {
-      ...formData,
       id: badge?.id || 0,
-      dataInicioEmissao: formData.dataInicioEmissao
-        ? new Date(formData.dataInicioEmissao)
+      name,
+      description,
+      icon,
+      // criteria: [],
+      validadeMeses,
+      dataInicioEmissao: dataInicioEmissao
+        ? new Date(dataInicioEmissao)
         : new Date(),
-      dataFimEmissao: formData.dataFimEmissao
-        ? new Date(formData.dataFimEmissao)
+      dataFimEmissao: dataFimEmissao
+        ? new Date(dataFimEmissao)
         : new Date(),
     } as Badge;
 
     onSave(badgeToSave);
-  };
-
-  // Função para truncar o texto e adicionar "..."
-  const truncateText = (text: string, maxLength: number) => {
-    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   };
 
   return (
@@ -267,50 +255,6 @@ export function DynamicForm({ badge, onClose, onSave, allCriteria }: DynamicForm
                 required
               />
             </div>
-          </div>
-
-          {/* Critérios */}
-          <div className="mb-4">
-            <label className="block text-base font-medium text-gray-700">
-              Critérios
-            </label>
-            <div className="flex mt-1">
-              <select
-                onChange={e => handleAddCriteria(e.target.value)}
-                value=""
-                className="flex-grow border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2 min-w-0 text-base"
-              >
-                <option value="" disabled>Selecione um critério para adicionar</option>
-                {allCriteria
-                  .filter(c => !formData.criteria.includes(c.descricao))
-                  .map(criterion => (
-                    <option
-                      key={criterion.id}
-                      value={criterion.descricao}
-                      title={`${criterion.pilar} - ${criterion.descricao}`}
-                      className="truncate"
-                    >
-                      {truncateText(`${criterion.pilar} - ${criterion.descricao}`, 70)}
-                    </option>
-                  ))
-                }
-              </select>
-            </div>
-
-            <ul className="mt-2 space-y-1 list-disc list-inside ml-1">
-              {formData.criteria.map((c, index) => (
-                <li key={index} className="flex items-center justify-between">
-                  <span className="text-base pr-2">{c}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveCriteria(index)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <X size={16} />
-                  </button>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Ações */}
