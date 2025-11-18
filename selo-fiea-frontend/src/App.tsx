@@ -43,15 +43,16 @@ function App() {
         <Route path="/dashboard/criterios" element={<CriteriaPage />} />
       </Route>
 
-      {/* Rotas Protegidas (Indústria) */}
-      <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
-      <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
-      <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
-      <Route path="/industry/dashboard/nova-empresa" element={<CompanyRegistrationPage />} />
-      <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
-      <Route path="/industry/dashboard/selos-disponiveis" element={<AvailableBadgesPage />} />
-    </Routes>
-  )
+      {/* NOVAS Rotas Protegidas (Indústria) */}
+      <Route element={<IndustryLayout />}>
+        <Route path="/industry/dashboard" element={<IndustryDashboardPage />} />
+        <Route path="/industry/assessment/:badgeId" element={<SelfAssessmentPage />} />
+        <Route path="/industry/dashboard/empresas" element={<MyCompaniesPage />} />
+        <Route path="/industry/dashboard/selos" element={<DigitalBadgesPage />} />
+        <Route path="/industry/dashboard/selos-disponiveis" element={<AvailableBadgesPage />} />
+      </Route>
+    </Routes>
+  )
 }
 
 export default App;
