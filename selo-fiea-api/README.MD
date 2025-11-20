@@ -1,6 +1,6 @@
-# Projeto Selo FIEA - Backend API
+# Projeto Selo - Backend API
 
-Repositório contendo o back-end do sistema de Certificação FIEA.
+Repositório contendo o back-end do sistema de Certificação.
 
 ## Pré-requisitos
 
@@ -13,8 +13,7 @@ Antes de começar, garanta que você tenha os seguintes softwares instalados:
 
 1.  **Clone o repositório:**
     ```bash
-    git clone git@github.com/BrandaoJatoba/selo-fiea-api.git
-    cd selo-fiea-api
+    git clone git@github.com/BrandaoJatoba/plataforma-selo-open-source.git
     ```
 
 2.  **Crie o arquivo de variáveis de ambiente:**
